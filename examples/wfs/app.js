@@ -52,36 +52,18 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'sidebar', 'map
                     base: true
                 }),
                 new ol.layer.Vector({
-                    title: "NUTS polys",
+                    title: "Kraje",
                     source: new WfsSource({
-                        url: 'http://gis.lesprojekt.cz/cgi-bin/mapserv?map=/home/dima/maps/nuts_2010_p_wfs.map',
-                        typename: 'nuts2',
-                        projection: 'EPSG:3857'
-                    }),
-                    style: style
-                }),
-                new ol.layer.Vector({
-                    title: "NUTS points",
-                    source: new WfsSource({
-                        url: 'http://gis.lesprojekt.cz/cgi-bin/mapserv?map=/home/dima/maps/nuts_2010_p_wfs.map',
-                        typename: 'nuts',
-                        projection: 'EPSG:3857'
-                    }),
-                    style: style
-                }),
-                new ol.layer.Vector({
-                    title: "Accidents",
-                    source: new WfsSource({
-                        url: 'http://gis.lesprojekt.cz/cgi-bin/mapserv?map=/home/dima/maps/accidents_wfs.map',
-                        typename: 'accidents',
+                        url: 'http://localhost:8080/geoserver/wfs?',
+                        typename: 'cr:kraje',
                         projection: 'EPSG:3857'
                     }),
                     style: style
                 })
             ],
             default_view: new ol.View({
-                center: ol.proj.transform([17.474129, 52.574000], 'EPSG:4326', 'EPSG:3857'), //Latitude longitude    to Spherical Mercator
-                zoom: 4,
+                center: ol.proj.transform([16.5500000, 49.200000], 'EPSG:4326', 'EPSG:3857'), //Latitude longitude    to Spherical Mercator
+                zoom: 8,
                 units: "m"
             })
         });
