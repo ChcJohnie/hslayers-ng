@@ -1,6 +1,6 @@
 'use strict';
 
-define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'sidebar', 'map', 'query', 'search', 'print', 'permalink', 'measure', 'geolocation', 'api', 'bootstrap', 'angular-gettext', 'translations'],
+define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'sidebar', 'map', 'attrTable',/*'query',*/ 'search', 'print', 'permalink', 'measure', 'geolocation', 'api', 'bootstrap', 'angular-gettext', 'translations'],
 
     function(angular, ol, toolbar, layermanager, WfsSource) {
         var module = angular.module('hs', [
@@ -8,12 +8,13 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'sidebar', 'map
             'hs.toolbar',
             'hs.layermanager',
             'hs.map',
-            'hs.query',
+            //'hs.query',
             'hs.search', 'hs.print', 'hs.permalink',
             'hs.geolocation',
             'hs.api',
             'gettext',
-            'hs.sidebar'
+            'hs.sidebar',
+            'hs.attrTable'
         ]);
 
         module.directive('hs', ['hs.map.service', 'Core', function(OlMap, Core) {
@@ -68,13 +69,28 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'sidebar', 'map
             })
         });
 
-        module.controller('Main', ['$scope', 'Core',
-            function($scope, Core) {
+        module.controller('Main', ['$rootScope', '$scope', 'Core','hs.map.service',
+            function($rootScope, $scope, Core, OlMap) {
                 if (console) console.log("Main called");
                 $scope.hsl_path = hsl_path; //Get this from hslayers.js file
                 $scope.Core = Core;
+                Core.sidebarRight = false;
+                Core.expandedToolbar = true;
+                Core.sidebarExpanded = false;
 
                 $scope.$on('infopanel.updated', function(event) {});
+                
+                $rootScope.$on('map.loaded', function(){
+                    OlMap.map.addInteraction(selector);
+                })
+                
+                var selector = new ol.interaction.Select({
+                    condition: ol.events.condition.click
+                });
+                
+                selector.getFeatures().on('add', function(e){
+                    console.log(e.element);
+                })
             }
         ]);
 

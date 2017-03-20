@@ -153,6 +153,44 @@ define(['angular', 'ol', 'WfsSource', 'WFSCapabilities', 'utils'],
             }
         ])
 
+        .service("hs.ows.wfs.transaction", ['$http', 'hs.map.service', 'hs.utils.service', '$rootScope',
+            function($http, OlMap, utils, $rootScope) {
+                var me = this;
+                
+                this.transactWFS = function(wfsOptions, mode, e) {
+                    var formatGML = new ol.format.GML({
+                        featureNS: wfsOptions.url,
+                        featureType: wfsOptions.typename,
+                        srsName: wfsOptions.projection
+                    });
+                    
+                    var xs = new XMLSerializer();
+                    
+                    var node;
+                    switch (mode) {
+                        case 'insert':
+                            node = formatWFS.writeTransaction([e], null, null, formatGML);
+                            break;
+                        case 'update':
+                            node = formatWFS.writeTransaction(null, [e], null, formatGML);
+                            break;
+                        case 'delete':
+                            node = formatWFS.writeTransaction(null, null, [e], formatGML);
+                            break;
+                    }
+                    var serialized = xs.serializeToString(node);
+                    $.ajax(wfsOptions.url, {
+                        service: 'WFS',
+                        type: 'POST',
+                        dataType: 'xml',
+                        processData: false,
+                        contentType: 'text/xml',
+                        data: serialized
+                    }).done(function() {
+                        $rootScope.$broadcast('transaction.done');
+                    });
+                }
+        })
         /**
          * @name hs.ows.wfs.controller
          * @ngdoc controller

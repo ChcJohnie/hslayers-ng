@@ -23,6 +23,7 @@ require.config({
         proj4: requirejs.s.contexts._.config.paths.proj4 || hsl_path + 'bower_components/proj4/dist/proj4',
         xml2json: requirejs.s.contexts._.config.paths.xml2json || hsl_path + 'bower_components/xml2json/xml2json.min',
         api: requirejs.s.contexts._.config.paths.api || hsl_path + 'components/api/api',
+        attrTable: hsl_path + 'components/attrTable/attrTable',
         compositions: hsl_path + 'components/compositions/compositions',
         datasource_selector: hsl_path + 'components/datasource_selector/datasource_selector',
         drag: hsl_path + 'components/drag/drag',
@@ -130,6 +131,7 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                         current_panel_queryable: false,
                         hsSize: {height: "100%",width: "100%"},
                         puremapApp: false,
+                        expandedToolbar: false,
                         /**
                          * @function setMainPanel
                          * @memberOf Core
@@ -172,20 +174,13 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                          * Change size of map element in application. Size should be rest of window width next to sidebar
                          */
                         updateMapSize: function() {
+                            //debugger;
                             var element = $("div[hs]");
                             var map = $("#map");
                             var sidebarElem = $('.panelspace');
-                            if (me.puremapApp) {
-                                map.width(element.width());
-                            }
-                            else if (element.width() > sidebarElem.width()) {
-                                map.width(element.width() - sidebarElem.width());
-                            } 
-                            else {
-                                map.width(0);
-                            }
+                            map.width(element.width());
                             if(angular.isDefined(OlMap.map)) OlMap.map.updateSize();
-                            map.width() < 368 ? me.smallWidth = true : me.smallWidth = false;
+                            ( map.width() - sidebarElem.width() ) < 368 ? me.smallWidth = true : me.smallWidth = false;
                             if (!$rootScope.$$phase) $rootScope.$digest();
                         },
                         /**
@@ -240,6 +235,10 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                          * Close selected panel. Resolve unpinned panels and new main panel in relevance to app settings. 
                          */
                         closePanel: function(which) {
+                            if (me.expandedToolbar == true) {
+                                me.sidebarExpanded = false;
+                                return;
+                            }
                             if (which.unpinned) {
                                 which.drag_panel.appendTo($(which.original_container));
                                 which.drag_panel.css({

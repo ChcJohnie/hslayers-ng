@@ -17,6 +17,17 @@ define(['angular', 'map', 'core', 'permalink'],
                     templateUrl: hsl_path + 'components/toolbar/partials/toolbar.html?bust=' + gitsha
                 };
             })
+        /**
+         * @memberof hs.toolbar
+         * @ngdoc directive
+         * @name hs.toolbar.directive
+         * @description Add expanded toolbar to map (instead of sidebar and classical toolbar)
+         */
+        .directive('hs.toolbar.expanded.directive', function() {
+            return {
+                templateUrl: hsl_path + 'components/toolbar/partials/expandedToolbar.html?bust=' + gitsha
+            };
+        })
 
         /**
          * @memberof hs.toolbar

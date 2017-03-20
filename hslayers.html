@@ -8,7 +8,9 @@
     <div id="content-wrapper" ng-class="{'open': Core.sidebarExpanded, 'sb-right': Core.sidebarRight && !Core.puremapApp, 'sb-left': !Core.sidebarRight && !Core.puremapApp}">
         <div class="page-content">
             <div hs.map.directive ng-controller="hs.map.controller" id="map" style="z-index:990"></div>
-            <div hs.toolbar.directive ng-controller="hs.toolbar.controller" ng-if="Core.exists('hs.toolbar.controller') && !Core.puremapApp" ng-show="!Core.smallWidth || !Core.sidebarExpanded"></div>
+            <div hs.toolbar.directive ng-controller="hs.toolbar.controller" ng-if="Core.exists('hs.toolbar.controller') && !Core.puremapApp && !Core.expandedToolbar" ng-show="!Core.smallWidth || !Core.sidebarExpanded"></div>
+            
+            <div hs.toolbar.expanded.directive ng-controller="hs.toolbar.controller" ng-if="Core.exists('hs.toolbar.controller') && !Core.puremapApp && Core.expandedToolbar"></div>
 
             <div class="gui-overlay" ng-if="!Core.puremapApp">
 
@@ -22,7 +24,7 @@
 
                 <div class="panelspace" ng-class="{'labels': Core.sidebarLabels, 'buttons': Core.sidebarButtons}">
                     <div class="panelspace-wrapper">
-                        <div id="sidebar" hs.sidebar.directive ng-controller="hs.sidebar.controller" ng-class="Core.mainpanel" ng-if="Core.exists('hs.sidebar.controller')" ng-cloak></div>
+                        <div id="sidebar" hs.sidebar.directive ng-controller="hs.sidebar.controller" ng-class="Core.mainpanel" ng-if="Core.exists('hs.sidebar.controller') && !Core.expandedToolbar" ng-cloak></div>
                         <div id="panelplace">
                             <div hs.layermanager.directive          hs.draggable ng-controller="hs.layermanager.controller" ng-show="Core.panelVisible('layermanager', this)"></div>
                             <div hs.legend.directive                hs.draggable ng-controller="hs.legend.controller" ng-if="Core.exists('hs.legend.controller')" ng-show="Core.panelVisible('legend', this)"></div>
@@ -40,6 +42,7 @@
                             <div hs.routing.directive               hs.draggable ng-controller="hs.routing.controller" ng-if="Core.exists('hs.routing.controller')" ng-show="Core.panelVisible('routing', this)"></div>
                             <div hs.tracking.directive              hs.draggable ng-controller="hs.tracking.controller" ng-if="Core.exists('hs.tracking.controller')" ng-show="Core.panelVisible('tracking', this)"></div>
                             <div hs.draw.directive                  hs.draggable ng-controller="hs.draw.controller" ng-if="Core.exists('hs.draw.controller')" ng-show="Core.panelVisible('draw', this)"></div>
+                            <div hs.attrTable.directive                  hs.draggable ng-controller="hs.attrTable.controller" ng-if="Core.exists('hs.attrTable.controller')" ng-show="Core.panelVisible('attrTable', this)"></div>
                             <div hs.customhtml.directive                                                            ng-if="Core.exists('hs.customhtml.controller')"></div>
                         </div>
                     </div>

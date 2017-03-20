@@ -36,11 +36,11 @@
   font-weight: normal;
   font-style: normal;
 }
-
+/*
 .sb-left div#map {
     margin-left: 48px;
 }
-
+*/
 .menu {
     list-style: none;
     border-bottom: 0.1em solid black;
@@ -450,7 +450,7 @@ button.but-title-sm {
 .sb-left .panelspace {
     left: 0
 }
-
+/*
 .sb-left.open #map {
     margin-left:400px;
 }
@@ -459,7 +459,7 @@ button.but-title-sm {
     margin-right:400px;
 }
 
-
+*/
 div#content-wrapper:not(.open) div.panelspace-wrapper {
     background-color: transparent;
     width: 48px;
@@ -818,7 +818,7 @@ div#composition-share-dialog .modal-body, div#composition-info-dialog .modal-bod
     div#content-wrapper.sb-right.open div.panelspace:not(.labels) .sidebar-list {
         right: 250px;
     }
-
+/*
     .sb-left.open #map {
         margin-left:300px;
     }
@@ -826,7 +826,7 @@ div#composition-share-dialog .modal-body, div#composition-info-dialog .modal-bod
     .sb-right.open #map {
         margin-left:0px;
     }
-
+*/
     div#sidebar ~ div#panelplace {
         width: 251px;
     }
