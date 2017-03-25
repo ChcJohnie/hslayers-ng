@@ -1069,3 +1069,55 @@ button.hs_draw_new_extended  {width: 172px}
     left: 48px;
     margin-left: -11px;
 }
+
+/* Workflow panel*/
+.wb-list {
+    height: 66px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    list-style-type: none;
+    margin-bottom: 0px;
+    padding-left: 0px;
+}
+.wb-item {
+    display: inline-block;
+    overflow-x: hidden;
+    margin: 0px 5px;
+    cursor: pointer;
+}
+.wb-number {
+    margin: 3px auto;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    font-weight: bold;
+    background-color: #90ee90;
+    border: 2px solid #62c662;
+}
+.wb-number:hover {
+    background-color: #62c662;
+    color: #fff;
+}
+.wb-item:hover .wb-number {
+    background-color: #62c662;
+    color: #fff;
+}
+.wb-number-active{
+    background-color: #90aeff;
+    border: 2px solid #6183e0;
+}
+.wb-number-blocked{
+    background-color: #8b8b8b;
+    border: 2px solid #8b8b8b;
+    cursor: not-allowed;
+}
+.wb-number-index {
+    margin: 0 auto;
+    text-align: center;
+    width: 20px;
+    height: 14px;
+    line-height: 14px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+} 

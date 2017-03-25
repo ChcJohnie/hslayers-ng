@@ -6,8 +6,27 @@
         </button>
     </div>
     <div class="panel-body">
-        <ul class="list-group" ng-repeat="flow in flows track by $index" >
-            <li class="list-group-item">{{$index+1}} {{flow.title}}</li>
+        <ul class="wb-list" >
+            <li class="wb-item" ng-repeat="flow in flows track by $index" ng-if="!flow.hidden" ng-click="setActive($index)">
+               <div >
+                <div class="wb-number" ng-class="{'wb-number-active': isActive($index), 'wb-number-blocked': !flow.allow}">
+                    <div class="wb-number-index">{{flow.index}}</div></div>
+                <div>{{flow.title}}</div>
+                </div>
+            </li>
         </ul>
+        <hr/>
+        <div id="wf1" ng-show="isActive(getIndex('index','1'))">
+            sdasdaasd
+        </div>
+        <div id="wf2" ng-show="isActive(getIndex('index','2'))" ng-click="changeProperty('hidden',false,'2')">
+            adsasddas
+        </div>
+        <div id="wf2.b" ng-show="isActive(getIndex('index','2.b'))">
+            asdasdasdsad
+        </div>
+        <div id="wf3" ng-show="isActive(getIndex('index','3'))">
+            sdaasdasdasd
+        </div>
     </div>
 </div>

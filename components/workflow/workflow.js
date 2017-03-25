@@ -24,72 +24,54 @@ define(['angular', 'map', 'core'],
                 $scope.flows = [
                     {
                         title: "Data collection",
-                        fields: [
-                            {
-                                title: "LPIS",
-                                type: "layer",
-                                default: "none"
-                            },
-                            {
-                                title: "Dose",
-                                type: "constant",
-                                default: 12
-                            }
-                        ],
-                        options: [
-                            {
-                                title: "Next",
-                                type: "nextPage"
-                            },
-                            {
-                                title: "Revert",
-                                type: ["deleteTrack","defaultValues"]
-                            }
-                        ]
+                        index: "1",
+                        tooltip: "Select datasource which should be accounted in compution",
+                        allow: true
                     },
                     {
                         title: "Recomputation",
-                        fields: [
-                            {
-                                title: "Counties",
-                                type: "response",
-                                default: "none"
-                            },
-                            {
-                                title: "Dosage",
-                                type: "constant",
-                                default: "100%"
-                            }
-                        ],
-                        options: [
-                            {
-                                title: "Next",
-                                type: "nextPage"
-                            },
-                            {
-                                title: "Revert",
-                                type: ["deleteTrack","defaultValues"]
-                            }
-                        ]
+                        index: "2",
+                        tooltip: "Change parameters and start proccesing",
+                        allow: true
                     },
                     {
-                        title: "Final data",
-                        fields: [
-                            {
-                                title: "Výnos",
-                                type: "response",
-                                default: "none"
-                            }
-                        ],
-                        options: [
-                            {
-                                title: "Finish",
-                                type: "final"
-                            }
-                        ]
+                        title: "Maybe see",
+                        index: "2.b",
+                        tooltip: "You should see this yet",
+                        hidden: true,
+                        allow: false
+                    },
+                    {
+                        title: "Results",
+                        index: "3",
+                        tooltips: "See results, export",
+                        allow: false
                     }
                 ];
 
+                $scope.activePage = $scope.flows[0];
+                
+                $scope.isActive = function(index) {
+                    return $scope.activePage == $scope.flows[index];
+                };
+                
+                $scope.setActive = function(index) {
+                    for (var i=0; i < $scope.flows.length; i++) { 
+                        if ($scope.flows[i].allow == false && i == index) return;
+                    }
+                    $scope.activePage = $scope.flows[index];
+                };
+                
+                $scope.getIndex = function(property, value) {
+                    for (var i=0; i < $scope.flows.length; i++) {
+                        if ($scope.flows[i][property] == value) return i;
+                    }
+                }
+                
+                $scope.changeProperty = function(property, value, index) {
+                    $scope.flows[index][property] = value;
+                }
+                
                 $scope.$emit('scope_loaded', "Workflow list");
         }
     ]);
