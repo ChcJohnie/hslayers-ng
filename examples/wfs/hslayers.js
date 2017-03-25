@@ -32,6 +32,7 @@ require.config({
         panoramio: hsl_path + 'components/layers/panoramio/panoramio',
         drag: hsl_path + 'components/drag/drag',
         core: hsl_path + 'components/core/core',
+        attrtable: hsl_path + 'components/attrtable/attrtable',
         WfsSource: hsl_path + 'components/layers/hs.source.Wfs',
         'angular-sanitize': hsl_path + 'bower_components/angular-sanitize/angular-sanitize',
         api: hsl_path + 'components/api/api',

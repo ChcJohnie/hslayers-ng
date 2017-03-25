@@ -459,12 +459,19 @@ button.but-title-sm {
     margin-right:400px;
 }
 
-*/
+*//*
 div#content-wrapper:not(.open) div.panelspace-wrapper {
     background-color: transparent;
     width: 48px;
     overflow-x: hidden;
 }
+
+div#content-wrapper.bar-hidden div.panelspace-wrapper {
+    background-color: transparent;
+    width: 0px;
+    overflow-x: hidden;
+}
+
 .panelspace-wrapper {
     height: 100%;
     padding-left:0;
@@ -472,7 +479,7 @@ div#content-wrapper:not(.open) div.panelspace-wrapper {
     overflow-y: auto;
     width: 400px;
 }
-
+*/
 div#sidebar {
     bottom: 0;
     position: absolute;
@@ -505,6 +512,17 @@ div#sidebar {
 
 #content-wrapper:not(.open) .panelspace {
     width: 48px;
+    border-right: 1px solid #ddd;
+}
+
+#content-wrapper.bar-hidden .panelspace {
+    width: 0px;
+    border-right: 1px solid #ddd;
+}
+
+#content-wrapper.panel-wide .panelspace {
+    width: 800px;
+    max-width: 66%;
     border-right: 1px solid #ddd;
 }
 
@@ -603,6 +621,14 @@ a.sidebar-main {
 .sb-left #toolbar {
     margin-left: 60px;
 }
+
+.sb-left.bar-hidden #toolbar {
+    margin-left: 12px;
+}
+
+.sb-left.panel-wide #toolbar {
+    margin-left:  812px;
+} 
 
 /********************/
 /** STATUS CREATOR **/
@@ -800,12 +826,29 @@ div#composition-share-dialog .modal-body, div#composition-info-dialog .modal-bod
 /**********************************/
 /** SIDEBAR&TOOLBAR RESPONSIVITY **/
 /**********************************/
+@media (max-width: 1024px) {
+    #content-wrapper.panel-wide .panelspace {
+        min-width:  300px;
+        width: 75%;
+        border-right: 1px solid #ddd;
+    }
+    
+    #content-wrapper.panel-wide #toolbar {
+        margin-left: calc(66% + 12px);
+    }
+}
+
 
 @media (max-width: 767px) {
-    .open div.panelspace, div.panelspace, .panelspace-wrapper {
+    .open div.panelspace, div.panelspace/*, .panelspace-wrapper*/ {
         width: 300px;
     }
 
+    #content-wrapper.panel-wide .panelspace {
+        min-width:  300px;
+        width: 75%;
+        border-right: 1px solid #ddd;
+    }
     .open.sb-left div#hs-info-container {
         margin-left: 300px;
         width: calc(100% - 300px);
@@ -843,6 +886,10 @@ div#composition-share-dialog .modal-body, div#composition-info-dialog .modal-bod
        margin-left: 310px;
     }
 
+    #content-wrapper.panel-wide #toolbar {
+        margin-left: calc(66% + 12px);
+    }
+    
     .panel-footer {
         padding: 5px;
     }

@@ -28,6 +28,8 @@ define(['angular', 'map', 'core', 'permalink'],
                 templateUrl: hsl_path + 'components/toolbar/partials/expandedToolbar.html?bust=' + gitsha
             };
         })
+        
+        
 
         /**
          * @memberof hs.toolbar

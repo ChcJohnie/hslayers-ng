@@ -19,6 +19,12 @@
             <button type="button" class="btn btn-default" ng-if="Core.exists('hs.layermanager.controller')" ng-click="setMainPanel('layermanager')">
                 <i class="menu-icon glyphicon icon-layers" data-toggle="tooltip" data-container="body" data-placement="auto" title="{{'Manage and style your layers in composition'|translate}}"></i>
             </button>
+            <button type="button" class="btn btn-default" ng-if="Core.exists('hs.attrtable.controller')" ng-click="setMainPanel('attrtable')">
+                <i class="menu-icon glyphicon icon-list" data-toggle="tooltip" data-container="body" data-placement="auto" title="{{'Attribute table'|translate}}"></i>
+            </button>
+            <button type="button" class="btn btn-default" ng-if="Core.exists('hs.workflow.controller')" ng-click="setMainPanel('workflow')">
+                <i class="menu-icon glyphicon icon-tasks" data-toggle="tooltip" data-container="body" data-placement="auto" title="{{'Workflow'|translate}}"></i>
+            </button>
 <!--
             <a href="#" class="sidebar-item list-group-item" ng-if="Core.exists('hs.legend.controller')" ng-click="setMainPanel('legend')" ng-class="{active: Core.mainpanel == 'legend'}">
                 <span class="menu-icon glyphicon legend-toolbtn">L</span>

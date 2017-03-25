@@ -23,7 +23,7 @@ require.config({
         proj4: requirejs.s.contexts._.config.paths.proj4 || hsl_path + 'bower_components/proj4/dist/proj4',
         xml2json: requirejs.s.contexts._.config.paths.xml2json || hsl_path + 'bower_components/xml2json/xml2json.min',
         api: requirejs.s.contexts._.config.paths.api || hsl_path + 'components/api/api',
-        attrTable: hsl_path + 'components/attrTable/attrTable',
+        attrtable: hsl_path + 'components/attrtable/attrtable',
         compositions: hsl_path + 'components/compositions/compositions',
         datasource_selector: hsl_path + 'components/datasource_selector/datasource_selector',
         drag: hsl_path + 'components/drag/drag',
@@ -55,6 +55,7 @@ require.config({
         toolbar: requirejs.s.contexts._.config.paths.toolbar || hsl_path + 'components/toolbar/toolbar',
         translations: requirejs.s.contexts._.config.paths.translations || hsl_path + 'components/translations/js/translations',
         utils: hsl_path + 'components/utils',
+        workflow: hsl_path + 'components/workflow/workflow',
         WFSCapabilities: requirejs.s.contexts._.config.paths.WFSCapabilities || hsl_path + 'components/format/hs.format.WFSCapabilities',
         WfsSource: requirejs.s.contexts._.config.paths.WfsSource || hsl_path + 'components/layers/hs.source.Wfs',
         routing: hsl_path + 'components/routing/routing',
@@ -116,12 +117,14 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                         config: config,
                         scopes_registered: [],
                         mainpanel: "",
+                        oldpanel: "",
                         defaultPanel: "",
                         sidebarExpanded: false,
                         sidebarRight: true,
                         sidebarLabels: true,
                         sidebarToggleable: true,
                         sidebarButtons: true,
+                        sidebarWide: false,
                         singleDatasources: false,
                         embededEnabled: true,
                         smallWidth: false,
@@ -132,6 +135,7 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                         hsSize: {height: "100%",width: "100%"},
                         puremapApp: false,
                         expandedToolbar: false,
+                        widePanels: ["attrtable"],
                         /**
                          * @function setMainPanel
                          * @memberOf Core
@@ -141,6 +145,9 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                          * Sets new main panel (Active panel when sidebar is in expanded mode). Change GUI and queryable status of map
                          */
                         setMainPanel: function(which, by_gui, queryable) {
+                            console.log(me.sidebarWide);
+                            checkPanelWidth(which);
+                            me.oldpanel = me.mainpanel;
                             if (which == me.mainpanel && by_gui) {
                                 which = "";
                                 if (me.sidebarExpanded == true) {
@@ -191,11 +198,14 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                          * @description Todo
                          */
                         panelVisible: function(which, scope) {
+                            //debugger;
                             if (angular.isDefined(scope))
                                 if (angular.isUndefined(scope.panel_name)) scope.panel_name = which;
                             if (angular.isDefined(me.panel_statuses[which])) {
                                 return me.panel_statuses[which];
                             }
+                            //console.log(which);
+                            //console.log(me.mainpanel == which || (angular.isDefined(scope) && scope.unpinned));
                             return me.mainpanel == which || (angular.isDefined(scope) && scope.unpinned);
                         },
                         /**
@@ -235,10 +245,8 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                          * Close selected panel. Resolve unpinned panels and new main panel in relevance to app settings. 
                          */
                         closePanel: function(which) {
-                            if (me.expandedToolbar == true) {
-                                me.sidebarExpanded = false;
-                                return;
-                            }
+                            me.oldpanel = "";
+                            
                             if (which.unpinned) {
                                 which.drag_panel.appendTo($(which.original_container));
                                 which.drag_panel.css({
@@ -248,18 +256,24 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                                 });
                             }
                             which.unpinned = false;
+                            if (me.expandedToolbar == true) {
+                                me.sidebarExpanded = false;
+                            }
                             if (which.panel_name == me.mainpanel) {
                                 if (me.defaultPanel != '') {
-                                    me.setMainPanel(me.defaultPanel)
+                                    me.setMainPanel(me.defaultPanel);
+                                    checkPanelWidth(me.defaultPanel);
                                 } else {
                                     me.mainpanel = '';
                                     me.sidebarLabels = true;
+                                    checkPanelWidth("");
                                 }
                                 if (!me.exists('hs.sidebar.controller')) {
                                     me.sidebarExpanded = false
                                 }
 
                             }
+                            
 
                             $rootScope.$broadcast('core.mainpanel_changed',which);
                         },
@@ -533,7 +547,17 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                         $("#map").height(size.height);
                         me.updateMapSize();
                         if(OlMap.map) OlMap.map.updateSize();
-                    }
+                    };
+                    
+                    function checkPanelWidth(panel) {
+                        if (me.widePanels.indexOf(panel) > -1) {
+                            me.sidebarWide = true;
+                        }
+                        else {
+                            me.sidebarWide = false;
+                        }
+                        if (!$rootScope.$$phase) $rootScope.$digest();
+                    };
                     return me;
                 },
 
