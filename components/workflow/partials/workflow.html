@@ -17,10 +17,29 @@
         </ul>
         <hr/>
         <div id="wf1" ng-show="isActive(getIndex('index','1'))">
-            sdasdaasd
+            <h4 for="working-layers" translate>Layers for compution of Yield potential</h4>
+            <div class="form-group">
+                <label for="lpis-layer" class="control-label" translate>LPIS</label>
+                <select name="lpis-layer" class="form-control" id="lpis-layer" ng-model="wfData.layers.lpisLayer">
+                    <option>--Select LPIS layer--</option>
+                    <option ng-repeat="layer in avaiLayers" value="{{layer}}">{{layer}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="water-layer" class="control-label" translate>Water zones</label>
+                <select name="water-layer" class="form-control" id="water-layer" ng-model="wfData.layers.waterLayer">
+                    <option ng-repeat="layer in avaiLayers" value="{{layer}}">{{layer}}</option>
+                </select>
+            </div>
+            <button type="button" class="btn btn-primary" ng-click="nextPage(getIndex('index','1'))" translate>Next</button>
         </div>
         <div id="wf2" ng-show="isActive(getIndex('index','2'))" ng-click="changeProperty('hidden',false,'2')">
-            adsasddas
+            <h4 for="working-layers" translate>Selected layers</h4>
+            <ul class="list-group row">
+                <li ng-repeat="layer in wfData.layers" class="list-group-item hs-lm-item">{{layer}}</li>
+            </ul>
+            <h4 for="coeficient" translate>Coef</h4>
+            <button type="button" class="btn btn-primary" ng-click="nextPage(getIndex('index','1'))" translate>Next</button>
         </div>
         <div id="wf2.b" ng-show="isActive(getIndex('index','2.b'))">
             asdasdasdsad

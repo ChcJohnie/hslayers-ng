@@ -25,6 +25,20 @@ define(['angular', 'map', 'core'],
                     }
                 }
                 
+                $scope.testLoad = function(loadedLayer) {
+                    var layer;
+                    OlMap.map.getLayers().forEach(function (lyr) {
+                        if (loadedLayer == lyr.get('title')) {
+                            layer = lyr;
+                        }            
+                    });
+                    var features = layer.getSource().getFeatures();
+                    console.log(features);
+                    console.log(features[0].getKeys());
+                    console.log(features[0].getProperties());
+                    //console.log(OlMap.map.getLayers());
+                }
+                
                 $scope.$on('core.mainpanel_changed', function(event) {
                     if (Core.mainpanel == 'attrtable') {
                         Core.sidebarWide = true;
