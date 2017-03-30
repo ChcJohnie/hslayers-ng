@@ -210,6 +210,7 @@ define(['angular', 'app', 'map', 'ol', 'utils', 'ows.wms', 'dragdroplists', 'sta
                                 sub_layers[i] = getLegendUrl(layer.getSource().getUrl(), sub_layers[i]);
                         }
                     }
+                    
                     //if (layer.get('base') != true) {
                         layer.on('change:visible', function(e) {
                             if (layer.get('base') != true) {
@@ -232,9 +233,10 @@ define(['angular', 'app', 'map', 'ol', 'utils', 'ows.wms', 'dragdroplists', 'sta
                             if (!$scope.$$phase) $scope.$digest();
                         })
                     //}
+                    
 
                     if (typeof layer.get('position') == 'undefined') layer.set('position', getMyLayerPosition(layer));
-                    if(console) console.log(layer.get('title'), layer.getVisible());
+                    //if(console) console.log(layer.get('title'), layer.getVisible());
                     var new_layer = {
                         title: getLayerTitle(layer),
                         layer: layer,
@@ -275,9 +277,34 @@ define(['angular', 'app', 'map', 'ol', 'utils', 'ows.wms', 'dragdroplists', 'sta
 
                     if (layer.getVisible() && layer.get("base")) $scope.baselayer = getLayerTitle(layer);
                     updateLayerOrder();
+                    
+                    if (layer instanceof ol.layer.Vector) {
+                        checkIDs(layer.getSource().getFeatures(),layer.get('title'));
+                        layer.getSource().once("change", function(e){
+                            if (layer.getSource().getState() == "ready") {
+                                checkIDs(layer.getSource().getFeatures(),layer.get('title'));
+                            };    
+                        });
+                    }
                     $rootScope.$broadcast('layermanager.updated', layer);
                     $scope.$emit('compositions.composition_edited');
                 };
+                function checkIDs(features,lyrTitle) {
+                    var counter = 1;
+                    var toChange = false;
+                    features.forEach(function(feature){
+                        if (feature.getId() == undefined) {
+                            toChange = true;
+                            return;
+                        };
+                    });
+                    if (toChange) {
+                        features.forEach(function(feature){
+                            feature.setId(lyrTitle + counter);
+                            counter++;  
+                        });
+                    }
+                }
                 /**
                  * (PRIVATE) Get title of selected layer
                  * @function getLayerTitle

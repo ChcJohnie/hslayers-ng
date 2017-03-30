@@ -1128,4 +1128,5 @@ button.hs_draw_new_extended  {width: 172px}
 }
 .st-selected{
   border-left:4px solid black;
+    background-color: darkgrey;
 }

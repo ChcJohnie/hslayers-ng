@@ -195,6 +195,71 @@ define(['angular', 'app', 'permalink', 'ol'], function(angular, app, permalink, 
         }
 
     }])
+    
+    .service('hs.map.selectionService', ['config', '$rootScope', 'hs.utils.service','hs.map.service', function (config, $rootScope, utils, OlMap) {
+        var me = this;
+
+        this.eventFlag = true;
+
+        var selector = new ol.interaction.Select({
+            condition: ol.events.condition.click,
+            toggleCondition: ol.events.condition.click
+        });
+        
+        this.init = function() {
+            OlMap.map.addInteraction(selector);
+            selector.getFeatures().on('add', function (e) {
+                if (me.eventFlag) {
+                    $rootScope.$broadcast("mapSelectionChanged", {
+                        "feature": e.element.getId(),
+                        "added": true
+                    });
+                }
+            })
+            
+            selector.getFeatures().on('remove', function (e) {
+                
+                if (me.eventFlag) $rootScope.$broadcast("mapSelectionChanged", {
+                    "feature": e.element.getId(),
+                    "added": false
+                });
+            })
+            
+            $rootScope.$on("tableSelectionChanged", function (event, data) {
+                if (data.added) {
+                    var layer = OlMap.findLayerByTitle(data["layer"]);
+                    var features = layer.getSource().getFeatures();
+                    me.eventFlag = false;
+                    features.forEach(function (feature) {
+                        if (feature.getId() == data["featureId"]) {
+                            selector.getFeatures().push(feature);
+                        }
+                    })
+                    me.eventFlag = true;
+                } else {
+                    var position = -1;
+                    var features = selector.getFeatures();
+                    features.forEach(function (feature, index) {
+                        if (feature.getId() == data["featureId"]) position = index;
+                    })
+                    me.eventFlag = false;
+                    if (position > -1) selector.getFeatures().removeAt(position);
+                    me.eventFlag = true;
+
+                }
+            });
+            
+        };
+
+        this.selectedFeatures = function () {
+            var features = selector.getFeatures();
+            var ids = [];
+            features.forEach(function(feature){
+                ids.push(feature.getId());    
+            });
+            return ids;
+        };
+    }])
 
     /**
      * @ngdoc directive

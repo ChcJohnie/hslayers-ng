@@ -147,8 +147,8 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource'/*, 'sidebar'*/, 
             }
         });
 
-        module.controller('Main', ['$rootScope', '$scope', 'Core','hs.map.service',
-            function($rootScope, $scope, Core, OlMap) {
+        module.controller('Main', ['$rootScope', '$scope', 'Core','hs.map.service','hs.map.selectionService',
+            function($rootScope, $scope, Core, OlMap, Selector) {
                 if (console) console.log("Main called");
                 $scope.hsl_path = hsl_path; //Get this from hslayers.js file
                 $scope.Core = Core;
@@ -158,36 +158,8 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource'/*, 'sidebar'*/, 
 
                 $scope.$on('infopanel.updated', function(event) {});
                 
-                $rootScope.$on('map.loaded', function(){
-                    OlMap.map.addInteraction(selector);
-                })
-                
-                var selector = new ol.interaction.Select({
-                    condition: ol.events.condition.click,
-                    toggleCondition: ol.events.condition.click
-                });
-                
-                selector.getFeatures().on('add', function(e){
-                    $scope.$broadcast("selectionAdded",e.element.getId()); 
-                })
-                
-                $scope.$on("tableFeatureAdded", function(event,data){
-                    var layer = OlMap.findLayerByTitle(data["layer"]);
-                    var features = layer.getSource().getFeatures();
-                    features.forEach(function(feature){
-                        if (feature.getId() == data["feature"]) {
-                            selector.getFeatures().push(feature);
-                        }
-                    })
-                });
-                
-                $scope.$on("tableFeatureRemoved", function(event,data){
-                    var position;
-                    var features = selector.getFeatures();
-                    features.forEach(function(feature, index){
-                        if (feature.getId() == data["feature"]) position = index;
-                    })
-                    if (position) selector.getFeatures().removeAt(position);
+                $rootScope.$on("map.loaded", function(e) {
+                    Selector.init();
                 });
             }
         ]);

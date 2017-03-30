@@ -9,12 +9,54 @@ define(['angular', 'map', 'core', 'angular-smart-table'],
                 };
             })
         
+        .directive('csSelect', function () {
+            return {
+                require: '^stTable',
+                scope: {
+                    row: '=csSelect'
+                },
+                link: function (scope, element, attr, ctrl) {
+
+                    element.bind('click', function (evt) {
+                        scope.$apply(function () {
+                            ctrl.select(scope.row, 'multiple');
+                        });
+                        var eventObject = {
+                            "layer": scope.row["layer"],
+                            "featureId": scope.row["ol_id"],
+                            "added": scope.row.isSelected
+                        };
+                        scope.$emit("tableSelectionChanged",eventObject);
+                    });
+
+                    scope.$on("mapSelectionChanged", function(event,data){
+                        if (scope.row["ol_id"] == data["feature"]) {
+                            ctrl.select(scope.row, 'multiple');
+                            if (scope.row.isSelected) {
+                                element.addClass('st-selected');
+                            } else {
+                                element.removeClass('st-selected');
+                            } 
+                        }
+                    })
+                    
+                    scope.$watch('row.isSelected', function (newValue, oldValue) {
+                        if (newValue === true) {
+                            element.addClass('st-selected');
+                        } else {
+                            element.removeClass('st-selected');
+                        }
+                    });
+                }
+            };
+        })
+        
          .service('hs.attrtable.service', function() {
 
                 }
             )
-         .controller('hs.attrtable.controller', ['$scope', '$compile','hs.map.service', 'hs.attrtable.service', 'Core', 
-            function($scope, $compile, OlMap, TableService, Core) {
+         .controller('hs.attrtable.controller', ['$scope', '$compile','hs.map.service','hs.map.selectionService', 'hs.attrtable.service', 'Core',
+            function($scope, $compile, OlMap,Selection, TableService, Core) {
                 $scope.tableHead = [];
                 $scope.tableBody = [];
                 $scope.itemsByPage = 10;
@@ -40,43 +82,23 @@ define(['angular', 'map', 'core', 'angular-smart-table'],
                     $scope.tableHead = [];
                     $scope.tableBody = [];
                     $scope.currentLayer = layer.get('title');
-                    checkIDs(features,layer.get('title'));
+                    var currentlySelected = Selection.selectedFeatures();
                     features.forEach(function(feature){
                         var properties = feature.getProperties();
-                        properties["ol_id"] = feature.getId();
                         var fProperties = {};
                         for (var key in properties) {
                             if (!properties.hasOwnProperty(key)) continue;
-                            if ($scope.tableHead.indexOf(key) == -1 && key != "geometry" && key != "ol_id") $scope.tableHead.push(key);
+                            if (key == "geometry") continue;
+                            if ($scope.tableHead.indexOf(key) == -1) $scope.tableHead.push(key);
                             fProperties[key] = properties[key];
                         }
+                        fProperties["ol_id"] = feature.getId();
+                        fProperties["layer"] = $scope.currentLayer;
+                        if (currentlySelected.indexOf(fProperties["ol_id"]) > -1) fProperties.isSelected = true;
                         $scope.tableBody.push(fProperties);
                     });
                 }
-                
-                $scope.selectAction = function(feature) {
-                    var event = {};
-                    event["layer"] = $scope.currentLayer;
-                    event["feature"] = feature["ol_id"];
-                    if (feature.isSelected) {
-                        $scope.$emit("tableFeatureAdded",event);
-                    }
-                    else {
-                        $scope.$emit("tableFeatureRemoved",event);
-                    }
-                    
-                }
-                
-                $scope.$on("selectionAdded",function(event,id) {
-                    $scope.tableBody.forEach(function(feature){
-                        if (feature["ol_id"] == id) {
-                            feature.isSelected = true;
-                            if ($scope.$$phase) $scope.$digest;
-                            return;
-                        }    
-                    });   
-                });
-                
+
                 $scope.$on('core.mainpanel_changed', function(event) {
                     if (Core.mainpanel == 'attrtable') {
                         Core.sidebarWide = true;
@@ -84,16 +106,6 @@ define(['angular', 'map', 'core', 'angular-smart-table'],
                 });
 
                 $scope.$emit('scope_loaded', "Attribute table");
-                
-                function checkIDs(features,lyrTitle) {
-                    var counter = 1;
-                    features.forEach(function(feature){
-                        if (feature.getId() == undefined) {
-                            feature.setId(lyrTitle + counter);
-                            counter++;
-                        }    
-                    });
-                }
         }
     ]);
 
