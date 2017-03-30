@@ -163,12 +163,32 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource'/*, 'sidebar'*/, 
                 })
                 
                 var selector = new ol.interaction.Select({
-                    condition: ol.events.condition.click
+                    condition: ol.events.condition.click,
+                    toggleCondition: ol.events.condition.click
                 });
                 
                 selector.getFeatures().on('add', function(e){
-                    console.log(e.element);
+                    $scope.$broadcast("selectionAdded",e.element.getId()); 
                 })
+                
+                $scope.$on("tableFeatureAdded", function(event,data){
+                    var layer = OlMap.findLayerByTitle(data["layer"]);
+                    var features = layer.getSource().getFeatures();
+                    features.forEach(function(feature){
+                        if (feature.getId() == data["feature"]) {
+                            selector.getFeatures().push(feature);
+                        }
+                    })
+                });
+                
+                $scope.$on("tableFeatureRemoved", function(event,data){
+                    var position;
+                    var features = selector.getFeatures();
+                    features.forEach(function(feature, index){
+                        if (feature.getId() == data["feature"]) position = index;
+                    })
+                    if (position) selector.getFeatures().removeAt(position);
+                });
             }
         ]);
 

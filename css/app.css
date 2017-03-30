@@ -1121,3 +1121,11 @@ button.hs_draw_new_extended  {width: 172px}
     top: 50%;
     transform: translateY(-50%);
 } 
+
+/*table*/
+.table-wide {
+    overflow-x: auto;
+}
+.st-selected{
+  border-left:4px solid black;
+}

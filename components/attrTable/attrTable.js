@@ -1,7 +1,7 @@
-define(['angular', 'map', 'core'],
+define(['angular', 'map', 'core', 'angular-smart-table'],
 
     function(angular) {
-        angular.module('hs.attrtable', ['hs.map', 'hs.core'])
+        angular.module('hs.attrtable', ['hs.map', 'hs.core','smart-table'])
             
             .directive('hs.attrtable.directive', function() {
                 return {
@@ -15,6 +15,10 @@ define(['angular', 'map', 'core'],
             )
          .controller('hs.attrtable.controller', ['$scope', '$compile','hs.map.service', 'hs.attrtable.service', 'Core', 
             function($scope, $compile, OlMap, TableService, Core) {
+                $scope.tableHead = [];
+                $scope.tableBody = [];
+                $scope.itemsByPage = 10;
+                $scope.currentLayer = "";
                 
                 $scope.closeTable = function(tablePanel) {
                     if (Core.oldpanel) {
@@ -33,11 +37,45 @@ define(['angular', 'map', 'core'],
                         }            
                     });
                     var features = layer.getSource().getFeatures();
-                    console.log(features);
-                    console.log(features[0].getKeys());
-                    console.log(features[0].getProperties());
-                    //console.log(OlMap.map.getLayers());
+                    $scope.tableHead = [];
+                    $scope.tableBody = [];
+                    $scope.currentLayer = layer.get('title');
+                    checkIDs(features,layer.get('title'));
+                    features.forEach(function(feature){
+                        var properties = feature.getProperties();
+                        properties["ol_id"] = feature.getId();
+                        var fProperties = {};
+                        for (var key in properties) {
+                            if (!properties.hasOwnProperty(key)) continue;
+                            if ($scope.tableHead.indexOf(key) == -1 && key != "geometry" && key != "ol_id") $scope.tableHead.push(key);
+                            fProperties[key] = properties[key];
+                        }
+                        $scope.tableBody.push(fProperties);
+                    });
                 }
+                
+                $scope.selectAction = function(feature) {
+                    var event = {};
+                    event["layer"] = $scope.currentLayer;
+                    event["feature"] = feature["ol_id"];
+                    if (feature.isSelected) {
+                        $scope.$emit("tableFeatureAdded",event);
+                    }
+                    else {
+                        $scope.$emit("tableFeatureRemoved",event);
+                    }
+                    
+                }
+                
+                $scope.$on("selectionAdded",function(event,id) {
+                    $scope.tableBody.forEach(function(feature){
+                        if (feature["ol_id"] == id) {
+                            feature.isSelected = true;
+                            if ($scope.$$phase) $scope.$digest;
+                            return;
+                        }    
+                    });   
+                });
                 
                 $scope.$on('core.mainpanel_changed', function(event) {
                     if (Core.mainpanel == 'attrtable') {
@@ -46,6 +84,16 @@ define(['angular', 'map', 'core'],
                 });
 
                 $scope.$emit('scope_loaded', "Attribute table");
+                
+                function checkIDs(features,lyrTitle) {
+                    var counter = 1;
+                    features.forEach(function(feature){
+                        if (feature.getId() == undefined) {
+                            feature.setId(lyrTitle + counter);
+                            counter++;
+                        }    
+                    });
+                }
         }
     ]);
 

@@ -15,6 +15,7 @@ require.config({
         'angular-sanitize': hsl_path + 'bower_components/angular-sanitize/angular-sanitize',
         'angular-gettext': hsl_path + 'bower_components/angular-gettext/dist/angular-gettext',
         'angularjs-socialshare': hsl_path + 'bower_components/angularjs-socialshare/dist/angular-socialshare',
+        'angular-smart-table': hsl_path + 'bower_components/angular-smart-table/dist/smart-table',
         bootstrap: requirejs.s.contexts._.config.paths.bootstrap || hsl_path + 'bower_components/bootstrap/dist/js/bootstrap',
         crossfilter: requirejs.s.contexts._.config.paths.crossfilter || hsl_path + 'bower_components/crossfilter/crossfilter.min',
         draw: hsl_path + 'components/draw/draw',
