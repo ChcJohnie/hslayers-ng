@@ -28,5 +28,8 @@
     "angular-update-meta": "1.9.0",
     "socket.io-client": "^1.4.8",
     "angular-smart-table": "^2.1.8"
+  },
+  "devDependencies": {
+    "angular-xeditable": "^0.7.0"
   }
 }

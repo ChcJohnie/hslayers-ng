@@ -14,12 +14,48 @@
             
             <thead>
                 <tr>
-                    <th  st-sort="{{col}}" ng-repeat="col in tableHead">{{col}}</th>
+                    <th><span st-sort="nazev">Nazev</span>
+                        <form editable-form name="nameform" onaftersave="" ng-show="nameform.$visible">
+                          <button type="submit" ng-disabled="nameform.$waiting" class="btn btn-primary">
+                            save
+                          </button>
+                          <button type="button" ng-disabled="nameform.$waiting" ng-click="nameform.$cancel()" class="btn btn-default">
+                            cancel
+                          </button>
+                        </form>  
+                        <button class="btn btn-default" ng-show="!nameform.$visible" ng-click="nameform.$show()">
+                          edit
+                        </button>
+                    </th>
+                    <th  st-sort="{{col}}" ng-repeat="col in tableHead track by $index">{{col}}
+                        <form editable-form name="c{{$index}}" onaftersave="" ng-show="c{{$index}}.$visible">
+                          <button type="submit" ng-disabled="c{{$index}}.$waiting" class="btn btn-primary">
+                            save
+                          </button>
+                          <button type="button" ng-disabled="c{{$index}}.$waiting" ng-click="formAction(col, $index, 'cancel', this)" class="btn btn-default">
+                            cancel
+                          </button>
+                        </form>  
+                        <button class="btn btn-default" ng-click="formAction(col, $index, 'show', this)" ng-show="!c{{$index}}.$visible">
+                          edit
+                        </button>
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 <tr cs-select="row" ng-repeat="row in tableDisplay">
-                    <td ng-repeat="col in tableHead">{{row[col]}}</td>  
+                    <td>
+                        <span editable-text="row.nazev" e-name="nazev" e-form="nameform" onbeforesave="">
+                          {{ row.nazev || 'empty' }}
+                        </span>
+                    </td>  
+                    <td ng-repeat="col in tableHead track by $index">
+                        <span editable-text="row['{{col}}']" e-name="{{col}}" e-form="c{{$index}}" onbeforesave="">
+                          {{ row[col] || 'empty' }}
+                        </span>
+
+                          
+                    </td>  
                 </tr>
             </tbody>
         </table>

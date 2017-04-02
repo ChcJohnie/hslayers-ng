@@ -16,6 +16,7 @@ require.config({
         'angular-gettext': hsl_path + 'bower_components/angular-gettext/dist/angular-gettext',
         'angularjs-socialshare': hsl_path + 'bower_components/angularjs-socialshare/dist/angular-socialshare',
         'angular-smart-table': hsl_path + 'bower_components/angular-smart-table/dist/smart-table',
+        'angular-xeditable': hsl_path + 'bower_components/angular-xeditable/dist/js/xeditable',
         bootstrap: requirejs.s.contexts._.config.paths.bootstrap || hsl_path + 'bower_components/bootstrap/dist/js/bootstrap',
         crossfilter: requirejs.s.contexts._.config.paths.crossfilter || hsl_path + 'bower_components/crossfilter/crossfilter.min',
         draw: hsl_path + 'components/draw/draw',
@@ -74,6 +75,9 @@ require.config({
             'exports': 'angular'
         },
         'angularjs-socialshare': {
+            deps: ['angular']
+        },
+        'angular-xeditable': {
             deps: ['angular']
         },
         'ngfocusif': {

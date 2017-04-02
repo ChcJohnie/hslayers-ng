@@ -1,7 +1,7 @@
-define(['angular', 'map', 'core', 'angular-smart-table'],
+define(['angular', 'map', 'core', 'angular-smart-table', 'angular-xeditable'],
 
     function(angular) {
-        angular.module('hs.attrtable', ['hs.map', 'hs.core','smart-table'])
+        angular.module('hs.attrtable', ['hs.map', 'hs.core','smart-table','xeditable'])
             
             .directive('hs.attrtable.directive', function() {
                 return {
@@ -62,6 +62,12 @@ define(['angular', 'map', 'core', 'angular-smart-table'],
                 $scope.itemsByPage = 10;
                 $scope.currentLayer = "";
                 
+                $scope.lpis = [
+                    {id: 23, code: "abc6579", type: "field"},
+                    {id: 38, code: "dc6579", type: "field"},
+                    {id: 41, code: "ebc6579", type: "grass"},
+                ];
+                
                 $scope.closeTable = function(tablePanel) {
                     if (Core.oldpanel) {
                         Core.setMainPanel(Core.oldpanel);
@@ -89,7 +95,13 @@ define(['angular', 'map', 'core', 'angular-smart-table'],
                         for (var key in properties) {
                             if (!properties.hasOwnProperty(key)) continue;
                             if (key == "geometry") continue;
-                            if ($scope.tableHead.indexOf(key) == -1) $scope.tableHead.push(key);
+                            if ($scope.tableHead.indexOf(key) == -1) {
+                                var head = {};
+                                head.name = key;
+                                head.form = key + "form";
+                                //console.log(head);
+                                $scope.tableHead.push(key);
+                            }
                             fProperties[key] = properties[key];
                         }
                         fProperties["ol_id"] = feature.getId();
@@ -99,6 +111,15 @@ define(['angular', 'map', 'core', 'angular-smart-table'],
                     });
                 }
 
+                $scope.formAction = function (key, index, action, childScope) {
+                    var formName = "c" + index;
+                    if (action === 'show') {
+                        childScope[formName].$show();
+                    };
+                    if (action === 'cancel') {
+                        childScope[formName].$cancel();
+                    }
+                };
                 $scope.$on('core.mainpanel_changed', function(event) {
                     if (Core.mainpanel == 'attrtable') {
                         Core.sidebarWide = true;
