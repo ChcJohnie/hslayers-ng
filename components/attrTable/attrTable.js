@@ -1,27 +1,33 @@
 define(['angular', 'map', 'core', 'angular-ui-grid', 'ows.wfs'],
 
     function(angular) {
-        angular.module('hs.attrtable', ['hs.map', 'hs.core','ui.grid','ui.grid.edit','ui.grid.resizeColumns','ui.grid.selection','hs.ows.wfs'])
+        angular.module('hs.attrtable', ['hs.map', 'hs.core','ui.grid','ui.grid.edit','ui.grid.resizeColumns','ui.grid.selection', 'ui.grid.pagination' ,'ui.grid.cellNav' ,'hs.ows.wfs'])
             
             .directive('hs.attrtable.directive', function() {
                 return {
                     templateUrl: hsl_path + 'components/attrtable/partials/attrtable.html?bust=' + gitsha
                 };
             })
-            
-         .service('hs.attrtable.service', ['$rootScope',
-            function($rootScope) {
-                var me = this;
-                
-                
-                
-                $rootScope.$on('tableOpened', function(event, layer){
-                    console.log(layer);    
-                });
+        
+        .directive('hs.attrtable.sizeDirective', function($window){
+            return{
+                link: function(scope,element,attrs) {
+                    var changeSize = function() {
+                        element.css('height', $window.innerHeight - 45 + 'px');
+                        scope.$emit('tableResized', $window.innerHeight - 45);
+                    }
+                    
+                    angular.element($window).bind('resize', function(){
+                        changeSize();    
+                    });
+                    
+                    changeSize();
                 }
-            ])
-         .controller('hs.attrtable.controller', ['$scope', '$compile','$timeout','hs.map.service','hs.map.selectionService', 'hs.attrtable.service', 'Core', 'uiGridConstants','hs.ows.wfs.transaction',
-            function($scope, $compile, $timeout, OlMap, Selection, TableService, Core, uiGridConstants,wfsTransaction) {
+            }
+        })
+
+         .controller('hs.attrtable.controller', ['$scope','$rootScope', '$compile','$timeout','$interval','hs.map.service','hs.map.selectionService', 'Core', 'uiGridConstants','hs.ows.wfs.transaction',
+            function($scope,$rootScope, $compile, $timeout, $interval, OlMap, Selection, Core, uiGridConstants,wfsTransaction) {
 
                 $scope.currentLayer = "";
                 
@@ -29,11 +35,20 @@ define(['angular', 'map', 'core', 'angular-ui-grid', 'ows.wfs'],
                 $scope.changes = [];
                 
                 var selectCounter = 0;
+                var tableRows = 0;
+                $scope.paginationAuto = true;
                 
                 $scope.tableOptions = {
                     enableSorting: true,
+                    paginationPageSize: 29,
+                    paginationPageSizes: [25, 50, 100, 200],
+                    enableCellEditOnFocus: true,
                     onRegisterApi: function( gridApi ) {
                         $scope.tableApi = gridApi;
+                        
+                        $interval( function() {
+                            $scope.tableApi.core.handleWindowResize();
+                          }, 200);
                         
                         gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef, newValue, oldValue){
                             if (newValue == oldValue) return;
@@ -44,7 +59,7 @@ define(['angular', 'map', 'core', 'angular-ui-grid', 'ows.wfs'],
                             change.value = newValue;
                             $scope.changes.push(change);
                           });
-                         gridApi.selection.on.rowSelectionChanged($scope, function(row){
+                        gridApi.selection.on.rowSelectionChanged($scope, function(row){
                             if (selectCounter != 0) {
                                 selectCounter--;
                                 return;
@@ -56,6 +71,9 @@ define(['angular', 'map', 'core', 'angular-ui-grid', 'ows.wfs'],
                             };
                             $scope.$emit('tableSelectionChanged',event);
                           });
+                        gridApi.pagination.on.paginationChanged($scope, function(cp, ps){
+                            if (ps > tableRows) $scope.paginationAuto = false;   
+                        });
                     }
                 };
                 
@@ -68,23 +86,27 @@ define(['angular', 'map', 'core', 'angular-ui-grid', 'ows.wfs'],
                     }
                 }
                 
-                $scope.testLoad = function(layer) {
+                $scope.loadTable = function(layer) {
                     $scope.loadLayer(layer);
                     $timeout(loadSelection,100);
                 }
                 
                 $scope.loadLayer = function(loadedLayer) {
                     var layer;
-                    OlMap.map.getLayers().forEach(function (lyr) {
-                        if (loadedLayer == lyr.get('title')) {
-                            layer = lyr;
-                        }            
-                    });
-                    var features = layer.getSource().getFeatures();
+                    if (loadedLayer instanceof ol.layer.Vector) {
+                        layer =loadedLayer;
+                    }
+                    else {
+                        OlMap.map.getLayers().forEach(function (lyr) {
+                            if (loadedLayer == lyr.get('title')) {
+                                layer = lyr;
+                            }            
+                        });
+                    }                    
                     $scope.tableHead = [];
                     $scope.tableBody = [];
                     $scope.currentLayer = layer.get('title');
-                    features.forEach(function(feature){
+                    layer.getSource().getFeatures().forEach(function(feature){
                         var properties = feature.getProperties();
                         var fProperties = {};
                         for (var key in properties) {
@@ -96,14 +118,13 @@ define(['angular', 'map', 'core', 'angular-ui-grid', 'ows.wfs'],
                         fProperties["layer"] = $scope.currentLayer;
                         $scope.tableBody.push(fProperties);
                     });
-                    for (var key in features[0].getProperties()){
+                    for (var key in layer.getSource().getFeatures()[0].getProperties()){
                         if (key == "geometry") continue;
-                        $scope.tableHead.push({field: key, width: "*"});
+                        $scope.tableHead.push({field: key, minWidth: "100", width: "100"});
                     } 
                     
                     $scope.tableOptions.data = $scope.tableBody;
                     $scope.tableOptions.columnDefs = $scope.tableHead;
-                    $scope.tableApi.core.queueGridRefresh();
                 }
                 
                 var loadSelection = function() {
@@ -119,6 +140,14 @@ define(['angular', 'map', 'core', 'angular-ui-grid', 'ows.wfs'],
                     });
                     $scope.tableApi.core.queueGridRefresh();
                     
+                }
+                
+                function resizeColumn(uid) {
+                    // document.querySelector might not be supported; if you have jQuery
+                    // in your project, it might be wise to use that for selecting this
+                    // element instead
+                    var resizer = document.querySelector('.ui-grid-col' + uid + ' .ui-grid-column-resizer.right');
+                    angular.element(resizer).triggerHandler('dblclick');
                 }
                 
                 $scope.saveChanges = function(){
@@ -148,6 +177,22 @@ define(['angular', 'map', 'core', 'angular-ui-grid', 'ows.wfs'],
                     $scope.tableChanged = false;
                     $scope.changes = [];
                 };
+                
+                $rootScope.$on('tableOpened', function(event, layer){
+                    $scope.loadTable(layer);
+                });
+                
+                $scope.$on('tableResized', function(event, height){
+                    var avaiHeight = height - 75;
+                    var rowPlaces = parseInt(avaiHeight / 30);
+                    tableRows = rowPlaces;
+                    if ($scope.paginationAuto == true) $scope.tableOptions.paginationPageSize = rowPlaces;
+                    
+                    var columns = $scope.tableApi.grid.columns;
+                    for(var i = 0; i < columns.length; i++) {
+                        resizeColumn(columns[i].uid);
+                    }
+                });
                 
                 $scope.$on('mapSelectionChanged', function(event,data) {
                     if (Core.mainpanel != 'attrtable') return;

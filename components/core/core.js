@@ -151,7 +151,6 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                          * Sets new main panel (Active panel when sidebar is in expanded mode). Change GUI and queryable status of map
                          */
                         setMainPanel: function(which, by_gui, queryable) {
-                            console.log(me.sidebarWide);
                             checkPanelWidth(which);
                             me.oldpanel = me.mainpanel;
                             if (which == me.mainpanel && by_gui) {

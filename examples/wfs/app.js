@@ -44,29 +44,51 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'attrtab
             })
         });
 
+        var projection = ol.proj.get('EPSG:3857');
+        var projectionExtent = projection.getExtent();
+        var size = ol.extent.getWidth(projectionExtent) / 256;
+        var resolutions = new Array(14);
+        var matrixIds = new Array(14);
+        for (var z = 0; z < 20; ++z) {
+            // generate resolutions and matrixIds arrays for this WMTS
+            resolutions[z] = size / Math.pow(2, z);
+            matrixIds[z] = z;
+        }
+    
         module.value('config', {
             default_layers: [
                 new ol.layer.Tile({
                     source: new ol.source.OSM(),
                     title: "Base layer",
-                    base: true
+                    base: true,
+                    visible: true
                 }),
-                new ol.layer.Vector({
-                    title: "Countries",
-                    source: new ol.source.Vector({
-                        format: new ol.format.GeoJSON(),
-                        url: 'countries.geojson'
+                new ol.layer.Tile({
+                    source: new ol.source.WMTS({
+                      url: 'http://wmts1.geoportail.lu/opendata/wmts/ortho_2016/{TileMatrixSet}/{TileMatrix}/{TileCol}/{TileRow}.jpeg',
+                      layer: 'Photographies aériennes orthorectifiées 2016',
+                      requestEncoding: "REST",
+                      matrixSet: 'GLOBAL_WEBMERCATOR_4_V3',
+                      projection: ol.proj.get('EPSG:3857'),
+                      tileGrid: new ol.tilegrid.WMTS({
+                        origin: ol.extent.getTopLeft(projectionExtent),
+                        resolutions: resolutions,
+                        matrixIds: matrixIds
+                      }),
+                      style: 'default',
                     }),
-                    style: style
+                    title: "Luxembourg Ortophoto",
+                    base: true,
+                    visible: false
                 }),
                 new ol.layer.Vector({
-                    title: "Kraje",
+                    title: "LPIS Luxembourg",
                     source: new WfsSource({
                         url: 'http://localhost:8080/geoserver/wfs?',
-                        typename: 'cr:kraje',
+                        typename: 'lux:LuxLpis',
                         projection: 'EPSG:3857',
-                        nameSpace: 'cr',
-                        featureType: 'kraje'
+                        nameSpace: 'lux',
+                        featureType: 'LuxLpis'
                     }),
                     style: style
                 }),
@@ -82,15 +104,14 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'attrtab
                         },
                         crossOrigin: null
                     }),
-                    path: 'Ilida Thematic Data',
                     visible: true,
                     opacity: 0.8
                 })
                 
             ],
             default_view: new ol.View({
-                center: ol.proj.transform([16.5500000, 49.200000], 'EPSG:4326', 'EPSG:3857'), //Latitude longitude    to Spherical Mercator
-                zoom: 8,
+                center: ol.proj.transform([6.1300000, 49.610000], 'EPSG:4326', 'EPSG:3857'), //Latitude longitude    to Spherical Mercator
+                zoom: 9,
                 units: "m"
             }),
             hostname: {
