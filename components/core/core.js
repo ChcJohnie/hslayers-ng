@@ -17,6 +17,7 @@ require.config({
         'angularjs-socialshare': hsl_path + 'bower_components/angularjs-socialshare/dist/angular-socialshare',
         'angular-smart-table': hsl_path + 'bower_components/angular-smart-table/dist/smart-table',
         'angular-xeditable': hsl_path + 'bower_components/angular-xeditable/dist/js/xeditable',
+        'angular-ui-grid': hsl_path + 'bower_components/angular-ui-grid/ui-grid',
         bootstrap: requirejs.s.contexts._.config.paths.bootstrap || hsl_path + 'bower_components/bootstrap/dist/js/bootstrap',
         crossfilter: requirejs.s.contexts._.config.paths.crossfilter || hsl_path + 'bower_components/crossfilter/crossfilter.min',
         draw: hsl_path + 'components/draw/draw',

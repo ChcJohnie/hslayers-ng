@@ -158,9 +158,13 @@ define(['angular', 'ol', 'WfsSource', 'WFSCapabilities', 'utils'],
                 var me = this;
                 
                 this.transactWFS = function(wfsOptions, mode, e) {
+                    var formatWFS = new ol.format.WFS();
+                    
+                    var url = utils.proxify(wfsOptions.url);
+                    
                     var formatGML = new ol.format.GML({
-                        featureNS: wfsOptions.url,
-                        featureType: wfsOptions.typename,
+                        featureNS: wfsOptions.nameSpace,
+                        featureType: wfsOptions.featureType,
                         srsName: wfsOptions.projection
                     });
                     
@@ -172,25 +176,27 @@ define(['angular', 'ol', 'WfsSource', 'WFSCapabilities', 'utils'],
                             node = formatWFS.writeTransaction([e], null, null, formatGML);
                             break;
                         case 'update':
-                            node = formatWFS.writeTransaction(null, [e], null, formatGML);
+                            node = formatWFS.writeTransaction(null, e, null, formatGML);
                             break;
                         case 'delete':
                             node = formatWFS.writeTransaction(null, null, [e], formatGML);
                             break;
                     }
                     var serialized = xs.serializeToString(node);
-                    $.ajax(wfsOptions.url, {
+                    var url = utils.proxify(wfsOptions.url);
+                    $.ajax(url, {
                         service: 'WFS',
                         type: 'POST',
                         dataType: 'xml',
                         processData: false,
                         contentType: 'text/xml',
                         data: serialized
-                    }).done(function() {
+                    }).done(function(r) {
+                        console.log(r);
                         $rootScope.$broadcast('transaction.done');
                     });
-                }
-        })
+                };
+        }])
         /**
          * @name hs.ows.wfs.controller
          * @ngdoc controller

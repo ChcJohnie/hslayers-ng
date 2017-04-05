@@ -1,6 +1,6 @@
 'use strict';
 
-define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource'/*, 'sidebar'*/, 'map', 'attrtable','workflow',/*'query',*/ 'search', 'print', 'permalink', 'measure', 'geolocation', 'api', 'bootstrap', 'angular-gettext', 'translations'],
+define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'attrtable','workflow', 'search', 'print', 'permalink', 'measure', 'geolocation', 'api', 'bootstrap', 'angular-gettext', 'translations'],
 
     function(angular, ol, toolbar, layermanager, WfsSource) {
         var module = angular.module('hs', [
@@ -8,12 +8,10 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource'/*, 'sidebar'*/, 
             'hs.toolbar',
             'hs.layermanager',
             'hs.map',
-            //'hs.query',
             'hs.search', 'hs.print', 'hs.permalink',
             'hs.geolocation',
             'hs.api',
             'gettext',
-            //'hs.sidebar',
             'hs.attrtable',
             'hs.workflow'
         ]);
@@ -66,7 +64,9 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource'/*, 'sidebar'*/, 
                     source: new WfsSource({
                         url: 'http://localhost:8080/geoserver/wfs?',
                         typename: 'cr:kraje',
-                        projection: 'EPSG:3857'
+                        projection: 'EPSG:3857',
+                        nameSpace: 'cr',
+                        featureType: 'kraje'
                     }),
                     style: style
                 }),
@@ -85,38 +85,6 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource'/*, 'sidebar'*/, 
                     path: 'Ilida Thematic Data',
                     visible: true,
                     opacity: 0.8
-                }),
-                new ol.layer.Tile({
-                    title: "Výnosový potenciál",
-                    source: new ol.source.TileWMS({
-                        url: 'http://foodie-data.wirelessinfo.cz/geoserver-hsl/kojcice/wms?',
-                        params: {
-                            LAYERS: 'kojcice_vynospot_5m_poly',
-                            //INFO_FORMAT: undefined,
-                            INFO_FORMAT: 'text/html',
-                            FORMAT: "image/png"
-                            },
-                        crossOrigin: null
-                    }),
-                    path: 'Kojčice',
-                    visible: true,
-                    opacity: 0.5
-                }),
-                new ol.layer.Tile({
-                    title: "Aplikační pásma dle výnosového potenciálu",
-                    source: new ol.source.TileWMS({
-                        url: 'http://foodie-data.wirelessinfo.cz/geoserver-hsl/kojcice/wms?',
-                        params: {
-                            LAYERS: 'kojcice_vra_n1_pole_viper',
-                            //INFO_FORMAT: undefined,
-                            INFO_FORMAT: 'text/html',
-                            FORMAT: "image/png"
-                        },
-                        crossOrigin: null
-                    }),
-                    path: 'Kojčice',
-                    visible: true,
-                    opacity: 0.5
                 })
                 
             ],

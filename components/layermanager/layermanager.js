@@ -905,6 +905,15 @@ define(['angular', 'app', 'map', 'ol', 'utils', 'ows.wms', 'dragdroplists', 'sta
                             $rootScope.$broadcast('compositions.load_composition', $scope.composition_id);
                         }
                     }
+                $scope.isTableable = function(layer_container) {
+                        var layer = layer_container.layer;
+                        if (layer instanceof ol.layer.Vector) return true;
+                        return false;
+                    }
+                
+                $scope.openTable = function(layer) {
+                    $scope.$emit('tableOpened',layer.layer);
+                }
                 /**
                  * @function isLayerQueryable
                  * @memberOf hs.layermanager.controller

@@ -1,72 +1,63 @@
-define(['angular', 'map', 'core', 'angular-smart-table', 'angular-xeditable'],
+define(['angular', 'map', 'core', 'angular-ui-grid', 'ows.wfs'],
 
     function(angular) {
-        angular.module('hs.attrtable', ['hs.map', 'hs.core','smart-table','xeditable'])
+        angular.module('hs.attrtable', ['hs.map', 'hs.core','ui.grid','ui.grid.edit','ui.grid.resizeColumns','ui.grid.selection','hs.ows.wfs'])
             
             .directive('hs.attrtable.directive', function() {
                 return {
                     templateUrl: hsl_path + 'components/attrtable/partials/attrtable.html?bust=' + gitsha
                 };
             })
-        
-        .directive('csSelect', function () {
-            return {
-                require: '^stTable',
-                scope: {
-                    row: '=csSelect'
-                },
-                link: function (scope, element, attr, ctrl) {
-
-                    element.bind('click', function (evt) {
-                        scope.$apply(function () {
-                            ctrl.select(scope.row, 'multiple');
-                        });
-                        var eventObject = {
-                            "layer": scope.row["layer"],
-                            "featureId": scope.row["ol_id"],
-                            "added": scope.row.isSelected
-                        };
-                        scope.$emit("tableSelectionChanged",eventObject);
-                    });
-
-                    scope.$on("mapSelectionChanged", function(event,data){
-                        if (scope.row["ol_id"] == data["feature"]) {
-                            ctrl.select(scope.row, 'multiple');
-                            if (scope.row.isSelected) {
-                                element.addClass('st-selected');
-                            } else {
-                                element.removeClass('st-selected');
-                            } 
-                        }
-                    })
-                    
-                    scope.$watch('row.isSelected', function (newValue, oldValue) {
-                        if (newValue === true) {
-                            element.addClass('st-selected');
-                        } else {
-                            element.removeClass('st-selected');
-                        }
-                    });
+            
+         .service('hs.attrtable.service', ['$rootScope',
+            function($rootScope) {
+                var me = this;
+                
+                
+                
+                $rootScope.$on('tableOpened', function(event, layer){
+                    console.log(layer);    
+                });
                 }
-            };
-        })
-        
-         .service('hs.attrtable.service', function() {
+            ])
+         .controller('hs.attrtable.controller', ['$scope', '$compile','$timeout','hs.map.service','hs.map.selectionService', 'hs.attrtable.service', 'Core', 'uiGridConstants','hs.ows.wfs.transaction',
+            function($scope, $compile, $timeout, OlMap, Selection, TableService, Core, uiGridConstants,wfsTransaction) {
 
-                }
-            )
-         .controller('hs.attrtable.controller', ['$scope', '$compile','hs.map.service','hs.map.selectionService', 'hs.attrtable.service', 'Core',
-            function($scope, $compile, OlMap,Selection, TableService, Core) {
-                $scope.tableHead = [];
-                $scope.tableBody = [];
-                $scope.itemsByPage = 10;
                 $scope.currentLayer = "";
                 
-                $scope.lpis = [
-                    {id: 23, code: "abc6579", type: "field"},
-                    {id: 38, code: "dc6579", type: "field"},
-                    {id: 41, code: "ebc6579", type: "grass"},
-                ];
+                $scope.tableChanged = false;
+                $scope.changes = [];
+                
+                var selectCounter = 0;
+                
+                $scope.tableOptions = {
+                    enableSorting: true,
+                    onRegisterApi: function( gridApi ) {
+                        $scope.tableApi = gridApi;
+                        
+                        gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef, newValue, oldValue){
+                            if (newValue == oldValue) return;
+                            if (!$scope.tableChanged) $scope.tableChanged = true;
+                            var change = {};
+                            change.feature = rowEntity["ol_id"];
+                            change.attribute = colDef.name;
+                            change.value = newValue;
+                            $scope.changes.push(change);
+                          });
+                         gridApi.selection.on.rowSelectionChanged($scope, function(row){
+                            if (selectCounter != 0) {
+                                selectCounter--;
+                                return;
+                            }
+                            var event = {
+                                added: row.isSelected,
+                                layer: $scope.currentLayer,
+                                featureId: row.entity.ol_id
+                            };
+                            $scope.$emit('tableSelectionChanged',event);
+                          });
+                    }
+                };
                 
                 $scope.closeTable = function(tablePanel) {
                     if (Core.oldpanel) {
@@ -77,7 +68,12 @@ define(['angular', 'map', 'core', 'angular-smart-table', 'angular-xeditable'],
                     }
                 }
                 
-                $scope.testLoad = function(loadedLayer) {
+                $scope.testLoad = function(layer) {
+                    $scope.loadLayer(layer);
+                    $timeout(loadSelection,100);
+                }
+                
+                $scope.loadLayer = function(loadedLayer) {
                     var layer;
                     OlMap.map.getLayers().forEach(function (lyr) {
                         if (loadedLayer == lyr.get('title')) {
@@ -88,38 +84,83 @@ define(['angular', 'map', 'core', 'angular-smart-table', 'angular-xeditable'],
                     $scope.tableHead = [];
                     $scope.tableBody = [];
                     $scope.currentLayer = layer.get('title');
-                    var currentlySelected = Selection.selectedFeatures();
                     features.forEach(function(feature){
                         var properties = feature.getProperties();
                         var fProperties = {};
                         for (var key in properties) {
                             if (!properties.hasOwnProperty(key)) continue;
                             if (key == "geometry") continue;
-                            if ($scope.tableHead.indexOf(key) == -1) {
-                                var head = {};
-                                head.name = key;
-                                head.form = key + "form";
-                                //console.log(head);
-                                $scope.tableHead.push(key);
-                            }
                             fProperties[key] = properties[key];
                         }
                         fProperties["ol_id"] = feature.getId();
                         fProperties["layer"] = $scope.currentLayer;
-                        if (currentlySelected.indexOf(fProperties["ol_id"]) > -1) fProperties.isSelected = true;
                         $scope.tableBody.push(fProperties);
                     });
+                    for (var key in features[0].getProperties()){
+                        if (key == "geometry") continue;
+                        $scope.tableHead.push({field: key, width: "*"});
+                    } 
+                    
+                    $scope.tableOptions.data = $scope.tableBody;
+                    $scope.tableOptions.columnDefs = $scope.tableHead;
+                    $scope.tableApi.core.queueGridRefresh();
                 }
-
-                $scope.formAction = function (key, index, action, childScope) {
-                    var formName = "c" + index;
-                    if (action === 'show') {
-                        childScope[formName].$show();
-                    };
-                    if (action === 'cancel') {
-                        childScope[formName].$cancel();
+                
+                var loadSelection = function() {
+                    var preSelected = Selection.selectedFeatures();
+                    preSelected.forEach(function(selected){
+                        for (var i = 0; i < $scope.tableOptions.data.length; i++) {
+                            if ($scope.tableOptions.data[i].ol_id == selected) {
+                                selectCounter++;
+                                $scope.tableApi.selection.toggleRowSelection($scope.tableOptions.data[i]);
+                                return;
+                            }
+                        }    
+                    });
+                    $scope.tableApi.core.queueGridRefresh();
+                    
+                }
+                
+                $scope.saveChanges = function(){
+                    var layer = OlMap.findLayerByTitle($scope.currentLayer);
+                    var source = layer.getSource();
+                    $scope.changes.forEach(function(change){
+                        var feature = source.getFeatureById(change.feature);
+                        var pair = {};
+                        pair[change.attribute] = change.value;
+                        feature.setProperties(pair);
+                    });
+                    
+                    if (angular.isDefined(source.defOptions) && source.defOptions.layerType == "WFS") {
+                        var features = [];
+                        $scope.changes.forEach(function(change){
+                            var feature = source.getFeatureById(change.feature);
+                            var clone = new ol.Feature(feature.getProperties());
+                            clone.setId(feature.getId());
+                            clone.set("the_geom",feature.getGeometry());
+                            clone.setGeometryName("the_geom");
+                            clone.unset("geometry");
+                            features.push(clone);    
+                        });
+                        wfsTransaction.transactWFS(source.defOptions,'update', features);
+                        
                     }
+                    $scope.tableChanged = false;
+                    $scope.changes = [];
                 };
+                
+                $scope.$on('mapSelectionChanged', function(event,data) {
+                    if (Core.mainpanel != 'attrtable') return;
+                    for (var i = 0; i < $scope.tableOptions.data.length; i++) {
+                        if ($scope.tableOptions.data[i].ol_id == data.featureId) {
+                            selectCounter++;
+                            $scope.tableApi.selection.toggleRowSelection($scope.tableOptions.data[i]);
+                            $scope.tableApi.core.queueGridRefresh();
+                            return;
+                        }
+                    }
+                });
+                
                 $scope.$on('core.mainpanel_changed', function(event) {
                     if (Core.mainpanel == 'attrtable') {
                         Core.sidebarWide = true;

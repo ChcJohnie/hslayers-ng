@@ -211,16 +211,15 @@ define(['angular', 'app', 'permalink', 'ol'], function(angular, app, permalink, 
             selector.getFeatures().on('add', function (e) {
                 if (me.eventFlag) {
                     $rootScope.$broadcast("mapSelectionChanged", {
-                        "feature": e.element.getId(),
+                        "featureId": e.element.getId(),
                         "added": true
                     });
                 }
             })
             
-            selector.getFeatures().on('remove', function (e) {
-                
+            selector.getFeatures().on('remove', function (e) {    
                 if (me.eventFlag) $rootScope.$broadcast("mapSelectionChanged", {
-                    "feature": e.element.getId(),
+                    "featureId": e.element.getId(),
                     "added": false
                 });
             })

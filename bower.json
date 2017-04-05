@@ -30,6 +30,10 @@
     "angular-smart-table": "^2.1.8"
   },
   "devDependencies": {
-    "angular-xeditable": "^0.7.0"
+    "angular-xeditable": "^0.7.0",
+    "angular-ui-grid": "^4.0.3"
+  },
+  "resolutions": {
+    "angular": ">=1.4.0 1.5.x"
   }
 }

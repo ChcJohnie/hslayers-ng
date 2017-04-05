@@ -1,5 +1,6 @@
 <div class="panel panel-default mainpanel">
     <div class="panel-heading"><span class="panel-title" translate>Attribute table</span>
+        <button type="button" class="btn btn-warning" ng-show="tableChanged" ng-click="saveChanges()">Save changes</button>
         <button type="button" class="close" ng-click="closeTable(this)">
             <span aria-hidden="true">×</span>
             <span class="sr-only" translate>Close</span>
@@ -8,72 +9,8 @@
     <div class="panel-body">
         <button type="button" class="btn btn-info" ng-click="testLoad('Kraje')">Load kraje</button>
         <button type="button" class="btn btn-info" ng-click="testLoad('Countries')">Load Countries</button>
-        
-        <div class="table-wide">
-        <table st-table="tableDisplay" st-safe-src="tableBody" class="table table-stripped">
-            
-            <thead>
-                <tr>
-                    <th><span st-sort="nazev">Nazev</span>
-                        <form editable-form name="nameform" onaftersave="" ng-show="nameform.$visible">
-                          <button type="submit" ng-disabled="nameform.$waiting" class="btn btn-primary">
-                            save
-                          </button>
-                          <button type="button" ng-disabled="nameform.$waiting" ng-click="nameform.$cancel()" class="btn btn-default">
-                            cancel
-                          </button>
-                        </form>  
-                        <button class="btn btn-default" ng-show="!nameform.$visible" ng-click="nameform.$show()">
-                          edit
-                        </button>
-                    </th>
-                    <th  st-sort="{{col}}" ng-repeat="col in tableHead track by $index">{{col}}
-                        <form editable-form name="c{{$index}}" onaftersave="" ng-show="c{{$index}}.$visible">
-                          <button type="submit" ng-disabled="c{{$index}}.$waiting" class="btn btn-primary">
-                            save
-                          </button>
-                          <button type="button" ng-disabled="c{{$index}}.$waiting" ng-click="formAction(col, $index, 'cancel', this)" class="btn btn-default">
-                            cancel
-                          </button>
-                        </form>  
-                        <button class="btn btn-default" ng-click="formAction(col, $index, 'show', this)" ng-show="!c{{$index}}.$visible">
-                          edit
-                        </button>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr cs-select="row" ng-repeat="row in tableDisplay">
-                    <td>
-                        <span editable-text="row.nazev" e-name="nazev" e-form="nameform" onbeforesave="">
-                          {{ row.nazev || 'empty' }}
-                        </span>
-                    </td>  
-                    <td ng-repeat="col in tableHead track by $index">
-                        <span editable-text="row['{{col}}']" e-name="{{col}}" e-form="c{{$index}}" onbeforesave="">
-                          {{ row[col] || 'empty' }}
-                        </span>
-
-                          
-                    </td>  
-                </tr>
-            </tbody>
-        </table>
-        <!--
-        <table st-table="tableBody" class="table table-stripped">
-            <thead>
-                <tr>
-                    <th st-sort="kod">Kod</th>
-                    <th st-sort="nazev">Nazev</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr  st-select-row="row" st-select-mode="multiple"  ng-repeat="row in tableBody">
-                    <td>{{row.kod}}</td>
-                    <td>{{row.nazev}}</td>  
-                </tr>
-            </tbody>
-        </table>-->
-        </div>
+            <div ui-grid="tableOptions" class="myGrid" ui-grid-edit ui-grid-resize-columns ui-grid-selection>
+                
+            </div>
     </div>
 </div>

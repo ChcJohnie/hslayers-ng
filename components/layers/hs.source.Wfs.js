@@ -5,6 +5,7 @@ define(function(require) {
         if (typeof options.hsproxy == 'undefined') options.hsproxy = true;
         if (typeof options.format == 'undefined') options.format = new ol.format.GeoJSON();
         options.projection = options.projection.toUpperCase();
+        options.layerType = "WFS";
         if (typeof options.outputFormat == 'undefined') {
             if (options.format instanceof ol.format.GeoJSON) 
                 options.outputFormat = 'json';
