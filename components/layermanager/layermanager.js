@@ -172,6 +172,7 @@ define(['angular', 'app', 'map', 'ol', 'utils', 'ows.wms', 'dragdroplists', 'sta
                 };
                 var map;
                 var cur_layer_opacity = 1;
+                $scope.cur_layer_opacity;
                 /**
                  * (PRIVATE) Prepare URL for GetLegendGraphic WMS request
                  * @function getLegendUrl
@@ -286,6 +287,7 @@ define(['angular', 'app', 'map', 'ol', 'utils', 'ows.wms', 'dragdroplists', 'sta
                             };    
                         });
                     }
+                    console.log("dub");
                     $rootScope.$broadcast('layermanager.updated', layer);
                     $scope.$emit('compositions.composition_edited');
                 };
@@ -595,8 +597,9 @@ define(['angular', 'app', 'map', 'ol', 'utils', 'ows.wms', 'dragdroplists', 'sta
                  * @description Set selected layers opacity and emits "compositionchanged"
                  * @param {Ol.layer} layer Selected layer
                  */
-                $scope.setLayerOpacity = function(layer) {
-                        layer.setOpacity($scope.cur_layer_opacity);
+                $scope.setLayerOpacity = function(layer, opacity) {
+                        if (angular.isDefined(opacity)) layer.setOpacity(opacity);
+                        else layer.setOpacity($scope.cur_layer_opacity);
                         $scope.$emit('compositions.composition_edited');
                         return false;
                     }

@@ -1,0 +1,58 @@
+<div id="floater">
+    <div class="panel-heading"><span class="panel-title" translate>Layer Overview</span>
+    </div>
+    <div class="panel panel-default hs-lm-panel">        
+        <ul class="list-group hs-lm-baselayerlist">
+            <li class="list-group-item hs-lm-header clearfix active">
+                <span translate>Baselayers</span>
+            </li>
+            <li class="list-group-item hs-lm-item" ng-repeat="layer in baselayers | orderBy:'name'" ng-click="changeBaseLayerVisibility($event, layer)" ng-mouseenter="hovering=true" ng-mouseleave="hovering=false" ng-class="{'hovering': (hovering && !layer.active)}" >
+                <span ng-if="layer.active" ng-class="layer.grayed ? 'text-muted': ''"><strong>{{layer.title}}</strong></span>
+                <span ng-if="!layer.active" ng-class="layer.grayed ? 'text-muted': ''">{{layer.title}}</span>
+                <span class="pull-right" ng-show="layer.active || hovering" ng-style="hovering && !layer.active && {'opacity':'0.5'}">
+                    <button class="btn btn-xs btn-link"><i class="glyphicon glyphicon-globe"></i></button>
+                </span>
+            </li>
+        </ul>
+
+        <ul class="list-group hs-lm-mapcontentlist">
+            <li class="list-group-item hs-lm-header active">
+                <span translate>Map Content</span>
+            </li>
+            <div class="list-group-item hs-lm-list">
+                <ul class="list-group row">
+                    <li ng-repeat="layer in layers | filter:query track by $index" id="layer{{$index}}" class="list-group-item hs-lm-item">
+                        <div class="hs-lm-item-title">{{layer.title}} </div>
+                        <div class="hs-lm-item-controls" ng-hide="layerValid(layer.layer)">
+                            <i class="glyphicon glyphicon-warning-sign hs-lm-warning-scale" title="{{'This layer is not available in this scale'|translate}}" data-toggle="tooltip" data-container="body" data-placement="auto" ng-show="layer.grayed" ng-click="$event.stopPropagation()" ></i>
+                            <i class="glyphicon glyphicon-info-sign hs-lm-queryable" title="{{'This layer is queryable'|translate}}" ng-show="isLayerQueryable(layer)" ng-click="$event.stopPropagation()" ></i>
+                            <button type="button" class="btn btn-xs btn-default" ng-click="changeLayerVisibility(!layer.visible, layer);$event.stopPropagation()" ><i class="glyphicon"ng-class="layer.visible ? 'glyphicon-eye-open': 'glyphicon-eye-close'"></i></button>
+                            <button type="button" class="btn btn-xs btn-default" ng-show="isTableable(layer)" ng-click="openTable(layer);$event.stopPropagation()" ><i class="glyphicon icon-list"></i></button>
+                            <button class="btn btn-xs btn-default" title="Style layer" lng-click="styleLayer(layer)" ng-show="layerIsStyleable(layer)"><i class=" glyphicon glyphicon-wrench"></i></button>
+                        </div>
+                        <div class="panel-body">
+                            <form>
+                            <!-- Opacity slider -->
+                            <div class="opacity">
+                                <label translate>Opacity</label>
+                                <input type="range" step="0.01" min="0" max="1" class="form-control" style="height: 21px;" ng-model="layer.opacity" ng-change="setLayerOpacity(layer)"/>
+                            </div>
+
+
+                            <!-- Legends -->
+                            <div class="form-group" ng-if="currentlayer.legends != null">
+                                <label translate>Legend</label>
+                                <p>
+                                     <img ng-repeat="legend in currentlayer.legends" ng-src="{{legend}}"  onerror=" this.parentNode.removeChild(this); " onload="if(this.height<6) { this.parentNode.removeChild(this); }" />
+                                </p>
+                            </div>
+                            <!-- Footer -->
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div> 
+        </ul>
+    </div>    
+</div>

@@ -1,0 +1,40 @@
+<div id="header">
+    <div class="row">
+        <div class="hidden-xs col-sm-2">
+            <h1 class="header-title">Fertilizer planning</h1>
+        </div>
+        <div class="col-xs-12 col-sm-10 col-md-8">
+            <ul class="nav nav-pills">
+                <li class="col-xs-2 header-button" ng-repeat="head in headers track by $index" ng-class="{'top-active': isActive($index), 'top-blocked': isBlocked($index), 'top-allowed': !isBlocked($index)}" ng-click="setActive($index)">
+                    <div><span>{{$index}}</span></div>
+                    <div>{{head}}</div>
+                </li>
+            </ul>
+        </div>
+        <div class="hidden-sm hidden-xs col-md-2">
+        <img src="logo1_FOODIE.png" alt="" class="header-image">
+        </div>
+    </div>
+</div>
+<div id="helper">
+    <div id="line0" class="helpline" ng-show="isActive(0)">
+        <span>Inspect available layers and continue to parcel selection when ready</span>
+        <button class="btn btn-warning" ng-click="setActive(1)">Continue</button>
+    </div>
+    <div id="line1" class="helpline" ng-show="isActive(1)">
+        <span>Select field parcels for computing Fertilizers. You can select by clicking on parcels on map. Total selected: {{selectedFields}} fields.</span>
+        <button class="btn btn-warning" ng-show="selectedFields > 0" ng-click="setActive(2)">Set Feartilizer rates</button>
+        <button class="btn btn-warning" ng-show="selectedFields > 0" ng-click="flushLpis()">Clean selection</button>
+    </div>
+    <div id="line2" class="helpline" ng-show="isActive(2)">
+        <span>Select Fertilizer type and standart rate for every selected field.</span>
+        <button class="btn btn-warning" ng-click="setActive(3)">Back</button>
+    </div>
+    <div id="line3" class="helpline" ng-show="isActive(3)">
+        <span>Review selected field and fertilizers and proceed to creation of Variable rate when ready</span>
+        <button class="btn btn-warning" ng-click="setActive(4)">Back</button>
+    </div>
+    <div id="line4" class="helpline" ng-show="isActive(4)">
+        <span>Inspect resulting layer. Save results for use in field.</span>
+    </div>
+</div>

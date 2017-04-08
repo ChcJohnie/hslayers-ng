@@ -10,41 +10,41 @@
             <li class="wb-item" ng-repeat="flow in flows track by $index" ng-if="!flow.hidden" ng-click="setActive($index)">
                <div >
                 <div class="wb-number" ng-class="{'wb-number-active': isActive($index), 'wb-number-blocked': !flow.allow}">
-                    <div class="wb-number-index">{{flow.index}}</div></div>
+                    <div class="wb-number-index">{{flow.id}}</div></div>
                 <div>{{flow.title}}</div>
                 </div>
             </li>
         </ul>
         <hr/>
-        <div id="wf1" ng-show="isActive(getIndex('index','1'))">
-            <h4 for="working-layers" translate>Layers for compution of Yield potential</h4>
+        <div id="wf1" ng-show="isActive(getIndex('id','1'))">
+            <h4>Select working layers</h4>
+            <p>Only layers with '*' necessary</p>
             <div class="form-group">
-                <label for="lpis-layer" class="control-label" translate>LPIS</label>
-                <select name="lpis-layer" class="form-control" id="lpis-layer" ng-model="wfData.layers.lpisLayer">
-                    <option>--Select LPIS layer--</option>
-                    <option ng-repeat="layer in avaiLayers" value="{{layer}}">{{layer}}</option>
+                <label for="lpis-layer" class="control-label" >LPIS fields <sup>*</sup></label>
+                <select name="lpis-layer" class="form-control" id="lpis-layer" ng-model="wfData.layers.lpisLayer" ng-change="pageChecker('1')">
+                    <option value="">--Select LPIS layer--</option>
+                    <option ng-repeat="layer in availableLayers" value="{{layer.title}}">{{layer.title}}</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="water-layer" class="control-label" translate>Water zones</label>
-                <select name="water-layer" class="form-control" id="water-layer" ng-model="wfData.layers.waterLayer">
-                    <option ng-repeat="layer in avaiLayers" value="{{layer}}">{{layer}}</option>
+                <label for="water-layer" class="control-label" >Water zones</label>
+                <select name="water-layer" class="form-control" id="water-layer" ng-model="wfData.layers.waterLayer" ng-change="pageChecker('1')">
+                    <option value="">--Select WaterZones layer--</option>
+                    <option ng-repeat="layer in availableLayers" value="layer">{{layer.title}}</option>
                 </select>
             </div>
-            <button type="button" class="btn btn-primary" ng-click="nextPage(getIndex('index','1'))" translate>Next</button>
+            <button type="button" class="btn btn-primary" ng-show="flows[getIndex('id','1')+1].allow" ng-click="nextPage(getIndex('id','1'))" >Next</button>
         </div>
-        <div id="wf2" ng-show="isActive(getIndex('index','2'))" ng-click="changeProperty('hidden',false,'2')">
-            <h4 for="working-layers" translate>Selected layers</h4>
-            <ul class="list-group row">
-                <li ng-repeat="layer in wfData.layers" class="list-group-item hs-lm-item">{{layer}}</li>
-            </ul>
-            <h4 for="coeficient" translate>Coef</h4>
-            <button type="button" class="btn btn-primary" ng-click="nextPage(getIndex('index','1'))" translate>Next</button>
+        <div id="wf2" ng-show="isActive(getIndex('id','2'))">
+            <h4>Pick LPIS fields on map ... waiting</h4>
+            <p ng-show="wfData.lpisSelected"><button type="button" class="btn btn-primary"  ng-click="createPlotLayer()">Create PLOT layer</button><span>total number of features {{wfData.lpisSelectedNumber}}</span></p>
+            <button type="button" class="btn btn-primary" ng-show="flows[getIndex('id','2')+2].allow" ng-click="nextPage(getIndex('id','1'))" >Next</button>
+             <button type="button" class="btn btn-primary" ng-click="sendJson()" >Compute Variable rate application</button>            
         </div>
-        <div id="wf2.b" ng-show="isActive(getIndex('index','2.b'))">
+        <div id="wf2.b" ng-show="isActive(getIndex('id','2.b'))">
             asdasdasdsad
         </div>
-        <div id="wf3" ng-show="isActive(getIndex('index','3'))">
+        <div id="wf3" ng-show="isActive(getIndex('id','3'))">
             sdaasdasdasd
         </div>
     </div>

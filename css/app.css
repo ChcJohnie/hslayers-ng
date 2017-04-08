@@ -534,6 +534,10 @@ div#sidebar {
     width: 48px;
 }
 
+#content-wrapper {
+    position: relative;
+}
+
 #sidebar ~ div#panelplace {
     height: 100%;
     overflow-y: auto;

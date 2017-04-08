@@ -139,6 +139,7 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                         _exist_cache: {},
                         current_panel_queryable: false,
                         hsSize: {height: "100%",width: "100%"},
+                        mapSize: false,
                         puremapApp: false,
                         expandedToolbar: false,
                         widePanels: ["attrtable"],
@@ -186,11 +187,26 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                          * Change size of map element in application. Size should be rest of window width next to sidebar
                          */
                         updateMapSize: function() {
-                            //debugger;
-                            var element = $("div[hs]");
+                            var size = {};
                             var map = $("#map");
+                            if (me.mapSize) {
+                                var mapSize = me.mapSize;
+                                var container = $("#" + mapSize.container);
+                                size.height = container.height();
+                                size.width = container.width();
+                                var wrapper = $("#content-wrapper");
+                                wrapper.height(size.height);
+                                wrapper.width(size.width);
+                            }
+                            else {
+                                var element = $("div[hs]");
+                                size.height = element.height();
+                                size.width = element.width();
+                            }
+                            
                             var sidebarElem = $('.panelspace');
-                            map.width(element.width());
+                            map.height(size.height);
+                            map.width(size.width);
                             if(angular.isDefined(OlMap.map)) OlMap.map.updateSize();
                             ( map.width() - sidebarElem.width() ) < 368 ? me.smallWidth = true : me.smallWidth = false;
                             if (!$rootScope.$$phase) $rootScope.$digest();
@@ -203,7 +219,7 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                          * @description Todo
                          */
                         panelVisible: function(which, scope) {
-                            //debugger;
+                            
                             if (angular.isDefined(scope))
                                 if (angular.isUndefined(scope.panel_name)) scope.panel_name = which;
                             if (angular.isDefined(me.panel_statuses[which])) {
@@ -311,17 +327,28 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                         * @description Universal function for initialization of directive with main HSLayers template and setting correct size to it. Take all posible inputs and switch to correct application size setter. Turn on all neceserary event listeners for resizing HSLayers element.
                         */
                         init: function(element, value) {
-                            if (typeof(value) == undefined) {
+                            var app;
+                            if (typeof(value) == "object") {
+                                app = value.app;
+                                if (angular.isDefined(value.map)) {
+                                    me.mapSize = value.map;
+                                }
+                            }
+                            else {
+                                app = value;
+                            }
+                            
+                            if (typeof(app) == "undefined") {
                                 me.fullScreenMap(element);
                             }
-                            else if (value == "self") {
+                            else if (app == "self") {
                                 me.appSize(element,element);
                             }
-                            else if (value == "parent") {
+                            else if (app == "parent") {
                                 me.appSize(element,element.parent());
                             }
                             else {
-                                var id = "#" + value;
+                                var id = "#" + app;
                                 me.appSize(element,$(id));
                             }
                         },
@@ -375,7 +402,6 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                             var size = getSize(container,me.hsSize);
                             element[0].style.height = size.height + "px";
                             element[0].style.width = size.width + "px";
-                            $("#map").height(size.height);
                             me.updateMapSize();
                         },
                         /**

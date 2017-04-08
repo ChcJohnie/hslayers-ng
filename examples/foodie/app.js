@@ -1,6 +1,6 @@
 'use strict';
 
-define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'attrtable','workflow', 'search', 'print', 'permalink', 'measure', 'geolocation', 'api', 'bootstrap', 'angular-gettext', 'translations'],
+define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'workflow', 'search', 'print', 'permalink', 'measure', 'geolocation', 'api', 'bootstrap', 'angular-gettext', 'translations','topbar', 'floater','tablefloater'],
 
     function(angular, ol, toolbar, layermanager, WfsSource) {
         var module = angular.module('hs', [
@@ -12,15 +12,17 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'attrtab
             'hs.geolocation',
             'hs.api',
             'gettext',
-            'hs.attrtable',
-            'hs.workflow'
+            'hs.workflow',
+            'topbar','floater','tablefloater'
         ]);
 
         module.directive('hs', ['hs.map.service', 'Core', function(OlMap, Core) {
             return {
-                templateUrl: hsl_path + 'hslayers.html',
+                templateUrl: 'hslayers.html',
                 link: function(scope, element) {
-                    Core.fullScreenMap(element);
+                    Core.init(element,{
+                        map: {container: "map-field"}
+                    });
                 }
             };
         }]);
@@ -36,11 +38,11 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'attrtab
                 radius: 5
             }),
             fill: new ol.style.Fill({
-                color: "rgba(139, 189, 214, 0.3)",
+                color: "rgba(108, 184, 222, 0.34)",
             }),
             stroke: new ol.style.Stroke({
-                color: '#112211',
-                width: 1
+                color: '#430043',
+                width: 2
             })
         });
 
@@ -148,7 +150,7 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'attrtab
                 $scope.$on('infopanel.updated', function(event) {});
                 
                 $rootScope.$on("map.loaded", function(e) {
-                    Selector.init();
+                    //Selector.init();
                 });
             }
         ]);
