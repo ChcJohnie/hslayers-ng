@@ -143,6 +143,7 @@ define(['angular', 'angular-gettext', 'translations', 'ol', 'map', 'drag', 'api'
                         puremapApp: false,
                         expandedToolbar: false,
                         widePanels: ["attrtable"],
+                        resetButton: angular.isDefined(config.resetButton) ? config.resetButton : true,
                         /**
                          * @function setMainPanel
                          * @memberOf Core

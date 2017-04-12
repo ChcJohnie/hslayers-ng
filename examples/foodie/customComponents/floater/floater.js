@@ -11,6 +11,8 @@ define(['angular', 'map', 'core'],
          .controller('floaterctrl', ['$rootScope','$scope', '$compile','hs.map.service', 'Core', 
             function($rootScope, $scope, $compile, OlMap, Core) {
                 
+                var resolution = 0;
+                
                 refreshManager();
                 
                 $rootScope.$on("layermanager.updated", function(event,data){
@@ -29,14 +31,6 @@ define(['angular', 'map', 'core'],
                     hslayers_api.gui.LayerManager.changeLayerVisibility(!layer.visible, layer);
                 }
                 
-                $scope.isTableable = function(layer) {
-                    return hslayers_api.gui.LayerManager.isTableable(layer);
-                }
-                
-                $scope.openTable = function(layer) {
-                    hslayers_api.gui.LayerManager.openTable(layer);
-                }
-                
                 $scope.setLayerOpacity = function(layer) {
                     hslayers_api.gui.LayerManager.setLayerOpacity(layer.layer, layer.opacity);
                 }
@@ -53,6 +47,26 @@ define(['angular', 'map', 'core'],
                 function refreshManager() {
                     $scope.baselayers = hslayers_api.gui.LayerManager.baselayers;
                     $scope.layers = hslayers_api.gui.LayerManager.layers;    
+                }
+                
+                $scope.checkResolution = function(layer) {
+                    return layer.layer.getMaxResolution() < resolution;
+                }
+                
+                if (angular.isDefined(OlMap.map)) init();
+                else {
+                    $rootScope.$on('map.loaded', function(e) {
+                        init();
+                    })    
+                }
+
+                
+                function init() {
+                    resolution = OlMap.map.getView().getResolution();
+                    OlMap.map.getView().on('change:resolution', function(e) {
+                        resolution = e.target.getResolution();
+                        $scope.$digest();
+                    });
                 }
                 
                 $scope.$emit('scope_loaded', "floater");

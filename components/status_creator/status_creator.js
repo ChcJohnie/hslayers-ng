@@ -478,6 +478,7 @@ define(['angular', 'ol', 'map', 'ngcookies'],
                 return me;
             }])
 //DUPLICATE?
+        /*
         .controller('hs.status_creator.controller', ['$scope', '$rootScope', 'hs.map.service', 'Core', 'hs.status_creator.service', 'config', '$compile', '$cookies',
                 function($scope, $rootScope, OlMap, Core, status_creator, config, $compile, $cookies) {
                     $scope.layers = [];
@@ -511,7 +512,7 @@ define(['angular', 'ol', 'map', 'ngcookies'],
                     });
                     return me;
                 }
-            ])
+            ])*/
             /**
              * @ngdoc controller
              * @name hs.status_creator.controller
@@ -798,6 +799,17 @@ define(['angular', 'ol', 'map', 'ngcookies'],
                         }, 0);
                     };
 
+                    function init(){
+                        $scope.getCurrentExtent();
+                    }
+
+                    if(angular.isDefined(OlMap.map))
+                        init()
+                    else 
+                        $rootScope.$on('map.loaded', function(){
+                            init();
+                    });
+                    
                     $scope.$on('compositions.composition_loaded', function(event, data) {
                         if (angular.isUndefined(data.error)) {
                             if (data.data) {
@@ -843,7 +855,7 @@ define(['angular', 'ol', 'map', 'ngcookies'],
 
                     });
 
-                    $scope.getCurrentExtent();
+                    
 
                     $scope.$emit('scope_loaded', "StatusCreator");
                 }

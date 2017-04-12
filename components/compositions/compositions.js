@@ -531,26 +531,6 @@ define(['angular', 'ol', 'SparqlJson', 'angularjs-socialshare', 'map', 'ows.nonw
                         composition.feature.set('highlighted', state)
                 }
 
-                hsMap.map.on('pointermove', function(evt) {
-                    var features = extent_layer.getSource().getFeaturesAtCoordinate(evt.coordinate);
-                    var something_done = false;
-                    $(extent_layer.getSource().getFeatures()).each(function() {
-                        if (this.get("record").highlighted) {
-                            this.get("record").highlighted = false;
-                            something_done = true;
-                        }
-                    });
-                    if (features.length) {
-                        $(features).each(function() {
-                            if (!this.get("record").highlighted) {
-                                this.get("record").highlighted = true;
-                                something_done = true;
-                            }
-                        })
-                    }
-                    if (something_done && !$scope.$$phase) $scope.$digest();
-                });
-
                 var extent_layer = new ol.layer.Vector({
                     title: "Composition extents",
                     show_in_manager: false,
@@ -568,7 +548,6 @@ define(['angular', 'ol', 'SparqlJson', 'angularjs-socialshare', 'map', 'ows.nonw
                     }
                 });
 
-                hsMap.map.addLayer(extent_layer);
 
                 $rootScope.$on('compositions.composition_edited', function(event) {
                     composition_parser.composition_edited = true;
@@ -735,6 +714,38 @@ define(['angular', 'ol', 'SparqlJson', 'angularjs-socialshare', 'map', 'ows.nonw
                     composition_parser.load(id);
                 }
 
+                function init(){
+                    hsMap.map.on('pointermove', function(evt) {
+                        var features = extent_layer.getSource().getFeaturesAtCoordinate(evt.coordinate);
+                        var something_done = false;
+                        $(extent_layer.getSource().getFeatures()).each(function() {
+                            if (this.get("record").highlighted) {
+                                this.get("record").highlighted = false;
+                                something_done = true;
+                            }
+                        });
+                        if (features.length) {
+                            $(features).each(function() {
+                                if (!this.get("record").highlighted) {
+                                    this.get("record").highlighted = true;
+                                    something_done = true;
+                                }
+                            })
+                        }
+                        if (something_done && !$scope.$$phase) $scope.$digest();
+                    });
+                
+                    hsMap.map.addLayer(extent_layer);
+
+                }
+                
+                if(angular.isDefined(hsMap.map))
+                    init()
+                else 
+                    $rootScope.$on('map.loaded', function(){
+                        init();
+                });
+                
                 $scope.$on('core.map_reset', function(event, data) {
                     composition_parser.composition_loaded = null;
                     composition_parser.composition_edited = false;

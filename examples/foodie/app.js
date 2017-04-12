@@ -8,7 +8,9 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'workflo
             'hs.toolbar',
             'hs.layermanager',
             'hs.map',
-            'hs.search', 'hs.print', 'hs.permalink',
+            'hs.search',
+            'hs.print',
+            'hs.permalink',
             'hs.geolocation',
             'hs.api',
             'gettext',
@@ -58,12 +60,13 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'workflo
         }
     
         module.value('config', {
+            resetButton: false,
             default_layers: [
                 new ol.layer.Tile({
                     source: new ol.source.OSM(),
-                    title: "Base layer",
+                    title: "Topography basemap",
                     base: true,
-                    visible: true
+                    visible: false
                 }),
                 new ol.layer.Tile({
                     source: new ol.source.WMTS({
@@ -81,35 +84,19 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'workflo
                     }),
                     title: "Luxembourg Ortophoto",
                     base: true,
-                    visible: false
+                    visible: true
                 }),
                 new ol.layer.Vector({
                     title: "LPIS Luxembourg",
                     source: new WfsSource({
-                        url: 'http://localhost:8080/geoserver/wfs?',
-                        typename: 'lux:LuxLpis',
+                        url: 'http://gis.lesprojekt.cz/cgi-bin/mapserv?map=/home/dima/maps/foodie/luxemburg.map',
+                        typename: 'lpis_borders',
                         projection: 'EPSG:3857',
-                        nameSpace: 'lux',
-                        featureType: 'LuxLpis'
+                        provider: 'mapserver'
                     }),
-                    style: style
-                }),
-                new ol.layer.Tile({
-                    title: "Ilida plastics kg/ha per year",
-                    source: new ol.source.TileWMS({
-                        url: 'http://gis.lesprojekt.cz/cgi-bin/mapserv?map=/home/dima/maps/ilida/ilida.map',
-                        params: {
-                            LAYERS: 'ilida_cultivation_plastics',
-                            INFO_FORMAT: undefined,
-                            FORMAT: "image/png",
-                            ABSTRACT: "Plastic waste in Ilida municipality"
-                        },
-                        crossOrigin: null
-                    }),
-                    visible: true,
-                    opacity: 0.8
+                    style: style,
+                    maxResolution: 10
                 })
-                
             ],
             default_view: new ol.View({
                 center: ol.proj.transform([6.1300000, 49.610000], 'EPSG:4326', 'EPSG:3857'), //Latitude longitude    to Spherical Mercator
@@ -135,12 +122,13 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'workflo
                     "editable": true,
                     "url": 'http://foodie-dev.wirelessinfo.cz'
                 },
-            }
+            },
+            variableRateUrl: "http://foodie-data.wirelessinfo.cz/geoserver-hsl/kojcice/wms"
         });
 
         module.controller('Main', ['$rootScope', '$scope', 'Core','hs.map.service','hs.map.selectionService',
             function($rootScope, $scope, Core, OlMap, Selector) {
-                if (console) console.log("Main called");
+                //if (console) console.log("Main called");
                 $scope.hsl_path = hsl_path; //Get this from hslayers.js file
                 $scope.Core = Core;
                 Core.sidebarRight = false;
@@ -149,9 +137,6 @@ define(['angular', 'ol', 'toolbar', 'layermanager', 'WfsSource', 'map', 'workflo
 
                 $scope.$on('infopanel.updated', function(event) {});
                 
-                $rootScope.$on("map.loaded", function(e) {
-                    //Selector.init();
-                });
             }
         ]);
 

@@ -17,11 +17,22 @@ define(function(require) {
             loader: function(extent, resolution, projection) {
                 this.set('loaded', false);
                 //this.clear();
-                if (console) console.log("resolution", resolution);
-                var p = options.url + (options.url.indexOf('?') > 0 ? '&' : '?') +
+                //if (console) console.log("resolution", resolution);
+                var p;
+                switch (options.provider) {
+                    case 'mapserver':
+                        p = options.url + '&'+
+                    'service=WFS&TYPENAME=' + options.typename + '&request=GetFeature&' +
+                    'version=' + options.version + '&' +
+                    'srsname=' + options.projection + '&outputFormat=geojson'  + '&bbox=' + extent.join(',');
+                        break;
+                    default:
+                        p = options.url + (options.url.indexOf('?') > 0 ? '&' : '?') +
                     'service=WFS&TYPENAME=' + options.typename + '&request=GetFeature&' +
                     'version=' + options.version + '&' +
                     'SRSNAME=' + options.projection + '&outputFormat=' + options.outputFormat + '&bbox=' + extent.join(',') + ',urn:ogc:def:crs:EPSG:6.3:3857';
+                        break;
+                }
                 var url = options.hsproxy ? "/cgi-bin/hsproxy.cgi?toEncoding=utf-8&url=" + window.escape(p) : p;
 
                 $.ajax({

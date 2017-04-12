@@ -278,33 +278,38 @@ define(['angular', 'app', 'map', 'ol', 'utils', 'ows.wms', 'dragdroplists', 'sta
 
                     if (layer.getVisible() && layer.get("base")) $scope.baselayer = getLayerTitle(layer);
                     updateLayerOrder();
-                    
+                    /*
                     if (layer instanceof ol.layer.Vector) {
-                        checkIDs(layer.getSource().getFeatures(),layer.get('title'));
-                        layer.getSource().once("change", function(e){
+                        checkIDs(layer);
+                        layer.getSource().on("change", function(e){
+                            console.log(e);
                             if (layer.getSource().getState() == "ready") {
-                                checkIDs(layer.getSource().getFeatures(),layer.get('title'));
+                                //checkIDs(layer);
                             };    
                         });
                     }
-                    console.log("dub");
-                    $rootScope.$broadcast('layermanager.updated', layer);
+                    */ $rootScope.$broadcast('layermanager.updated', layer);
                     $scope.$emit('compositions.composition_edited');
                 };
-                function checkIDs(features,lyrTitle) {
-                    var counter = 1;
+                function checkIDs(layer) {
                     var toChange = false;
-                    features.forEach(function(feature){
+                    layer.getSource().getFeatures().forEach(function(feature){
                         if (feature.getId() == undefined) {
                             toChange = true;
                             return;
                         };
                     });
+
                     if (toChange) {
-                        features.forEach(function(feature){
-                            feature.setId(lyrTitle + counter);
-                            counter++;  
-                        });
+    
+                            var counter = 1;
+                            var lyrTitle = layer.get('title');
+                            layer.getSource().getFeatures().forEach(function(feature){
+                                
+                                feature.id_ = lyrTitle + feature.get('flik'); 
+                                console.log(feature);
+                            });
+                        console.log(layer.getSource().getFeatures());
                     }
                 }
                 /**
